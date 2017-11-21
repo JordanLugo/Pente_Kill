@@ -5,18 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Pente_Kill"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <UniformGrid x:Name="TileGrid"
-                 Columns="20"
-                 Rows="20"   
-                 >
-        </UniformGrid>
-        <UniformGrid x:Name="PlacementGrid"
-                    Columns="19"
-                    Rows="19"
-                    >
-
-        </UniformGrid>
+        Title="Pente" Height="350" Width="525">
+    <Grid x:Name="Grid">
+        
     </Grid>
 </Window>

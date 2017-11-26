@@ -24,7 +24,6 @@ namespace Pente_Kill
         public MainWindow()
         {
             InitializeComponent();
-            Grid.Children.Add(new PlayField(this));
         }
 
     }

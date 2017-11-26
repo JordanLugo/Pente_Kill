@@ -8,5 +8,6 @@
         mc:Ignorable="d"
         Title="Pente" Height="350" Width="525">
     <Grid x:Name="Grid">
+        <gb:PlayField/>
     </Grid>
 </Window>

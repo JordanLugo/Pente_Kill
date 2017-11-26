@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="Pente_Kill.Controls.PlayField"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Pente_Kill.Controls"
+             mc:Ignorable="d">
+    <Grid Name="container"
+          Margin="5">
+        <Label Background="GreenYellow">
+            <Grid>
+                <Label Background="Black"
+                       x:Name="intersections"/>
+                <Grid x:Name="backGrid"
+                          Panel.ZIndex="0"/>
+                <Grid x:Name="foreGrid"
+                          Panel.ZIndex="1"/>
+            </Grid>
+        </Label>
+    </Grid>
+</UserControl>

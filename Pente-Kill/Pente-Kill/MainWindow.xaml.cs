@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pente_Kill.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,7 +24,7 @@ namespace Pente_Kill
         public MainWindow()
         {
             InitializeComponent();
-            new Us
+            Grid.Children.Add(new PlayField(this));
         }
 
     }

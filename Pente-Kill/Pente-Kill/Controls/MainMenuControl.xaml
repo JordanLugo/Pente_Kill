@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:Pente_Kill.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid>
+    <Grid
+        Background="DarkOrchid">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/> 
             <RowDefinition Height="*"/>
@@ -23,18 +24,120 @@
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
+        <Label
+            Grid.Row="0"
+            Grid.ColumnSpan="5"
+            Content="Welcome to Pente"
+            Foreground="Gold"
+            FontSize="25"
+            FontWeight="ExtraBold"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            />
         <Button
             x:Name="NewGameButton"
             Grid.Column="1"
             Grid.Row="1"
-            Background="WhiteSmoke"
+            Background="Black"
             MinHeight="20"
             MinWidth="20"
             MaxHeight="25"
             MaxWidth="25"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
-            
+            />
+        <Label
+            x:Name="NewGameLabel"
+            Grid.Column="3"
+            Grid.Row="1"
+            Foreground="Gold"
+            Content="New Game"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            />
+        <Button
+            x:Name="LoadGameButton"
+            Grid.Column="1"
+            Grid.Row="2"
+            Background="Black"
+            MinHeight="20"
+            MinWidth="20"
+            MaxHeight="25"
+            MaxWidth="25"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            />
+        <Label
+            x:Name="LoadGameLabel"
+            Grid.Column="3"
+            Grid.Row="2"
+            Foreground="Gold"
+            Content="Load Game"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            />
+        <Button
+            x:Name="RulesButton"
+            Grid.Column="1"
+            Grid.Row="3"
+            Background="Black"
+            MinHeight="20"
+            MinWidth="20"
+            MaxHeight="25"
+            MaxWidth="25"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            />
+        <Label
+            x:Name="RulesLabel"
+            Grid.Column="3"
+            Grid.Row="3"
+            Foreground="Gold"
+            Content="Rules"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            />
+        <Button
+            x:Name="OptionsButton"
+            Grid.Column="1"
+            Grid.Row="4"
+            Background="Black"
+            MinHeight="20"
+            MinWidth="20"
+            MaxHeight="25"
+            MaxWidth="25"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            />
+        <Label
+            x:Name="OptionsLabel"
+            Grid.Column="3"
+            Grid.Row="4"
+            Foreground="Gold"
+            Content="Options"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            />
+        <Button
+            x:Name="ExitButton"
+            Grid.Column="1"
+            Grid.Row="5"
+            Background="Black"
+            MinHeight="20"
+            MinWidth="20"
+            MaxHeight="25"
+            MaxWidth="25"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            />
+        <Label
+            x:Name="ExitLabel"
+            Grid.Column="3"
+            Grid.Row="5"
+            Foreground="Gold"
+            Content="Exit"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
             />
     </Grid>
 </UserControl>

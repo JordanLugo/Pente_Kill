@@ -24,5 +24,6 @@ namespace Pente_Kill.Controls
         {
             InitializeComponent();
         }
+
     }
 }

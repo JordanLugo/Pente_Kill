@@ -24,7 +24,7 @@ namespace Pente_Kill
         public MainWindow()
         {
             InitializeComponent();
-            //new MainMenuControl(this);
+            new MainMenuControl(this);
 
         }
 

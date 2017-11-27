@@ -67,7 +67,7 @@
             VerticalAlignment="Center"
             Background="WhiteSmoke"
             Foreground="Black"
-            Content="Back to Home Menu"
+            Content="Back to Home Menu" Click="HomeMenuButton_Click"
             />
     </Grid>
 </UserControl>

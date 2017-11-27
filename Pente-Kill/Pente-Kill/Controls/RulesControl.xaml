@@ -108,7 +108,7 @@
             Content="Back to Main Menu"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
-            Grid.Row="4"
+            Grid.Row="4" Click="MenuButton_Click"
             />
     </Grid>
 </UserControl>

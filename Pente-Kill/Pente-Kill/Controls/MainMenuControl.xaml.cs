@@ -48,12 +48,12 @@ namespace Pente_Kill.Controls
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
-
+            new SettingsControl(Window);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-
+            App.Current.Shutdown();
         }
     }
 }

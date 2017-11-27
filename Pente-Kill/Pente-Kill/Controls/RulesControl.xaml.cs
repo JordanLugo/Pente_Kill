@@ -27,8 +27,13 @@ namespace Pente_Kill.Controls
             Window = main;
             Window.Height = 300;
             Window.Width = 300;
-            Window.Grid.Childeren.Clear();
-            Window.Grid.Childeren.Add(this);
+            Window.Grid.Children.Clear();
+            Window.Grid.Children.Add(this);
+        }
+
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            new MainMenuControl(Window);
         }
     }
 }

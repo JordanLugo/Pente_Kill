@@ -23,9 +23,21 @@ namespace Pente_Kill.Controls
 
         public int BoardSize { get; set; }
 
-        public SettingsControl()
+        public MainWindow Window { get; set; }
+
+        public SettingsControl(MainWindow main)
         {
             InitializeComponent();
+            Window = main;
+            Window.Width = 300;
+            Window.Height = 300;
+            Window.Grid.Children.Clear();
+            Window.Grid.Children.Add(this);
+        }
+
+        private void HomeMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            new MainMenuControl(Window);
         }
     }
 }

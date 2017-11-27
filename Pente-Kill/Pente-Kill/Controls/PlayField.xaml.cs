@@ -22,12 +22,12 @@ namespace Pente_Kill.Controls
     public partial class PlayField : UserControl
     {
         public MainWindow Main { get; set; }
-        public Label[,] Pieces { get; set; } = null;
+        public Ellipse[,] Pieces { get; set; } = null;
         private const int gameBoardSize = 550;
         public PlayField()
         {
             InitializeComponent();
-            CreateGrid(9);
+            CreateGrid(8);
         }
 
         public PlayField(MainWindow window)
@@ -44,9 +44,10 @@ namespace Pente_Kill.Controls
         /// <param name="gridSize">The number of pieces along the edges of the wanted upon creation.</param>
         private void CreateGrid(int gridSize)
         {
+            Pieces = new Ellipse[gridSize, gridSize];
             Thickness boardSeparation = new Thickness(1);
             Thickness borderThickness = new Thickness(0);
-            int column = 0, row = 0, boardSize = gameBoardSize/(gridSize + 1), pieceSize = (gameBoardSize - boardSize) / gridSize;
+            int column = 0, row = 0, boardSize = (gameBoardSize - gridSize * 2 )/ (gridSize + 1), pieceSize = ((gameBoardSize - (gridSize - 1) * 2) - boardSize) / gridSize;
             foreGrid.ColumnDefinitions.Clear();
             foreGrid.RowDefinitions.Clear();
             backGrid.ColumnDefinitions.Clear();
@@ -82,19 +83,29 @@ namespace Pente_Kill.Controls
             row = 0;
             for (int gridPosition = 0; gridPosition < Math.Pow(gridSize, 2); gridPosition++)
             {
-                Pieces = new Label[gridSize, gridSize];
-                Pieces[column, row] = new Label();
+                Pieces[column, row] = new Ellipse();
                 Pieces[column, row].Height = pieceSize;
                 Pieces[column, row].Width = pieceSize;
-                Pieces[column, row].Background = Brushes.Violet;
+                Pieces[column, row].Fill = Brushes.Transparent;
                 Pieces[column, row].Margin = boardSeparation;
-                Pieces[column, row].BorderThickness = borderThickness;
                 Pieces[column, row].MouseLeftButtonDown += PlacePiece;
                 Grid.SetColumn(Pieces[column, row], column);
                 Grid.SetRow(Pieces[column, row], row);
                 foreGrid.Children.Add(Pieces[column, row]);
                 column = (column == gridSize - 1) ? 0 : column + 1;
                 row = (column == 0) ? row + 1 : row;
+            }
+            int test = gridSize / 2;
+            if (gridSize % 2 == 0)
+            {
+                Pieces[test - 1, test - 1].Fill = Brushes.Black;
+                Pieces[test, test - 1].Fill = Brushes.Black;
+                Pieces[test - 1, test].Fill = Brushes.Black;
+                Pieces[test, test].Fill = Brushes.Black;
+            }
+            else
+            {
+                Pieces[test, test].Fill = Brushes.Black;
             }
         }
 
@@ -147,11 +158,7 @@ namespace Pente_Kill.Controls
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
         {
-            Shape piece = new Ellipse()
-            {
-                Width = 10,
-                Height = 10
-            };
+            Ellipse piece = (Ellipse)sender;
             switch (currentPlayer)
             {
                 case true:
@@ -162,8 +169,6 @@ namespace Pente_Kill.Controls
                     break;
             }
             currentPlayer = !currentPlayer;
-            Label position = (Label)sender;
-            position.Content = piece;
         }
 
         private static bool currentPlayer = false;

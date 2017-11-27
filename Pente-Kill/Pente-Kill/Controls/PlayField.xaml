@@ -6,8 +6,13 @@
              xmlns:local="clr-namespace:Pente_Kill.Controls"
              mc:Ignorable="d">
     <Grid Name="container"
-          Margin="5">
-        <Label Background="GreenYellow">
+          Margin="5"
+          Background="GreenYellow">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Label>
             <Grid>
                 <Label Background="Black"
                        x:Name="intersections"/>
@@ -17,5 +22,26 @@
                           Panel.ZIndex="1"/>
             </Grid>
         </Label>
+
+        <Grid x:Name="TimerSave"
+              Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label x:Name="TimerLabel"
+                   HorizontalContentAlignment="Center"
+                   VerticalContentAlignment="Center"
+                   FontSize="32"
+                   Background="Black"
+                   Foreground="Gold"
+                   />
+            <Button x:Name="SaveButton"
+                    Grid.Row="1"
+                    Background="Black"
+                    Foreground="Gold"
+                    FontSize="24"
+                    Content="Save" Click="SaveButton_Click"/>
+        </Grid>
     </Grid>
 </UserControl>

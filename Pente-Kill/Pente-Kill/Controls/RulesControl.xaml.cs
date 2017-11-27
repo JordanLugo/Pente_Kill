@@ -20,9 +20,15 @@ namespace Pente_Kill.Controls
     /// </summary>
     public partial class RulesControl : UserControl
     {
-        public RulesControl()
+        public MainWindow Window { get; set; }
+        public RulesControl(MainWindow main)
         {
             InitializeComponent();
+            Window = main;
+            Window.Height = 300;
+            Window.Width = 300;
+            Window.Grid.Childeren.Clear();
+            Window.Grid.Childeren.Add(this);
         }
     }
 }

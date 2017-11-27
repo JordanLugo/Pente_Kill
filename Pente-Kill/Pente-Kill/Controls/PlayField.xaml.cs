@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Pente_Kill.Controls
 {
@@ -98,51 +99,26 @@ namespace Pente_Kill.Controls
             }
         }
 
-        public void PopulateGrids()
+        private DispatcherTimer dispatchTimer = new DispatcherTimer();
+        private void Play_StopButton_Click(object sender, RoutedEventArgs e)
         {
-            //for (int i = 0; i < TileGrid.Columns; i++)
-            //{
-            //    for (int j = 0; j < TileGrid.Rows; j++)
-            //    {
-            //        Label l = new Label();
-            //        l.Background = Brushes.LightGray;
-            //        l.BorderBrush = Brushes.DarkGray;
-            //        if (i == 0 && j == 0)
-            //            l.BorderThickness = new Thickness(0, 0, 1, 1);
-            //        else if (i == 0 && (j != 0 && j != TileGrid.Rows))
-            //            l.BorderThickness = new Thickness(1, 0, 1, 1);
-            //        else if (i == 0 && j == TileGrid.Rows)
-            //            l.BorderThickness = new Thickness(1, 0, 0, 1);
-            //        else if ((i != 0 && i != TileGrid.Columns) && j == 0)
-            //            l.BorderThickness = new Thickness(0, 1, 1, 1);
-            //        else if (i == TileGrid.Columns && j == 0)
-            //            l.BorderThickness = new Thickness(0, 1, 1, 0);
-            //        else if (i == TileGrid.Columns && (j != 0 && j != TileGrid.Rows))
-            //            l.BorderThickness = new Thickness(1, 1, 1, 0);
-            //        else if (i == TileGrid.Columns && j == TileGrid.Rows)
-            //            l.BorderThickness = new Thickness(1, 1, 0, 0);
-            //        else if ((i != 0 && i != TileGrid.Columns) && j == TileGrid.Rows)
-            //            l.BorderThickness = new Thickness(1, 1, 0, 1);
-            //        else
-            //            l.BorderThickness = new Thickness(1);
-            //        TileGrid.Children.Add(l);
+            TimeSpan ts = new TimeSpan(0, 0, 0, 0, 1000);
+            dispatchTimer.Tick += dispatchTimer_Tick;
+            dispatchTimer.Interval = ts;
+            if (!dispatchTimer.IsEnabled)
+            {
+                dispatchTimer.Start();
+            }
+            else
+            {
+                dispatchTimer.Stop();
+            }
 
-            //    }
-            //}
-            //Double margin = TileGrid.Width / 40;
-            //PlacementGrid.Margin = new Thickness(margin);
-            //for (int i = 0; i < PlacementGrid.Columns; i++)
-            //{
-            //    for (int j = 0; j < PlacementGrid.Rows; j++)
-            //    {
-            //        Label l = new Label()
-            //        {
-            //            Background = Brushes.Blue
-            //        };
-            //        l.MouseLeftButtonDown += PlacePiece;
-            //        PlacementGrid.Children.Add(l);
-            //    }
-            //}
+        }
+
+        private void dispatchTimer_Tick(object sender, EventArgs e)
+        {
+            //Do something here
         }
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)

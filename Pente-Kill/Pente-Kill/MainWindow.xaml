@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Pente_Kill"
         mc:Ignorable="d"
         Title="Pente" Height="350" Width="525">
-    <Grid x:Name="Grid">
+    <Grid x:Name="MainGrid">
         
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pente_Kill.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,21 +19,19 @@ namespace Pente_Kill.Controls
     /// <summary>
     /// Interaction logic for UserControl1.xaml
     /// </summary>
-    public partial class UserControl1 : UserControl
+    public partial class Grid : UserControl
     {
         public MainWindow Main { get; set; }
-        public UserControl1()
+
+        public Token[,] Tokens { get; set; }
+        public Grid(MainWindow window)
         {
             InitializeComponent();
-            PopulateGrids();
-        }
-
-        public UserControl1(MainWindow window)
-        {
             Main = window;
-            Main.Grid.Children.Clear();
+            Main.MainGrid.Children.Clear();
             Main.Width = 850;
             Main.Height = 850;
+            PopulateGrids();
         }
 
 
@@ -85,6 +84,7 @@ namespace Pente_Kill.Controls
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
         {
+            Label currentLabel = (Label)sender;
             Shape ea = new Ellipse()
             {
                 Width = 10,
@@ -100,6 +100,7 @@ namespace Pente_Kill.Controls
                     break;
             }
             currentPlayer = !currentPlayer;
+            ((Label)sender).Content = ea;
         }
 
         private static bool currentPlayer = false;

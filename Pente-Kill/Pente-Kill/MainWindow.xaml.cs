@@ -23,7 +23,7 @@ namespace Pente_Kill
         public MainWindow()
         {
             InitializeComponent();
-            new Us
+            new Controls.Grid(this);
         }
 
     }

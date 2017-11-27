@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pente_Kill.Models
 {
-    class Token
+    public class Token
     {
 
         public bool Color { get; set; }

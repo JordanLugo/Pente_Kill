@@ -164,9 +164,9 @@ namespace Pente_Kill.Controls
 
         private void AllOtherTurns(bool startEnd, Brush color)
         {
-            for (int column = 0; column < gridSize; column++)
+            for (int row = 0; row < gridSize; row++)
             {
-                for (int row = 0; row < gridSize; row++)
+                for (int column = 0; column < gridSize; column++)
                 {
                     Color(Pieces[row, column], color, startEnd ? .5 : 1, startEnd);
                 }
@@ -175,9 +175,9 @@ namespace Pente_Kill.Controls
 
         private void TurnThree(bool startEnd)
         {
-            for (int column = 3; column < gridSize - 3; column++)
+            for (int row = 3; row < gridSize - 3; row++)
             {
-                for (int row = 3; row < gridSize - 3; row++)
+                for (int column = 3; column < gridSize - 3; column++)
                 {
                     Color(Pieces[row, column], Brushes.Black, startEnd ? .5 : 1, startEnd);
                 }
@@ -205,12 +205,12 @@ namespace Pente_Kill.Controls
         {
             int jumpCount = count;
 
-            if (pieceColumn - 1 > -1 && Pieces[pieceRow, pieceColumn - 1].Fill != color && Pieces[pieceRow, pieceColumn - 1].Fill != Brushes.Transparent)
+            if (pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn].Fill != color && Pieces[pieceRow - 1, pieceColumn].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureUp(pieceRow, pieceColumn - 1, jumpCount, color);
+                jumpCount = CheckForCaptureUp(pieceRow - 1, pieceColumn, jumpCount, color);
             }
-            else if (pieceColumn - 1 > -1 && Pieces[pieceRow, pieceColumn - 1].Fill == color)
+            else if (pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn].Fill == color)
             {
                 capture = true;
             }
@@ -231,24 +231,20 @@ namespace Pente_Kill.Controls
         {
             int jumpCount = count;
 
-            if (pieceColumn - 1 > -1 && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn - 1].Fill != color && Pieces[pieceRow + 1, pieceColumn - 1].Fill != Brushes.Transparent)
+            if (pieceRow - 1 > -1 && pieceColumn + 1 < gridSize && Pieces[pieceRow - 1, pieceColumn + 1].Fill != color && Pieces[pieceRow - 1, pieceColumn + 1].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureUpRight(pieceRow + 1, pieceColumn - 1, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
-                else if (pieceColumn - 1 > -1 && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn - 1].Fill == color)
-                {
-                    capture = true;
-                }
-                if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
+                jumpCount = CheckForCaptureUpRight(pieceRow - 1, pieceColumn + 1, jumpCount, color);
+                
+            }
+            else if (pieceRow - 1 > -1 && pieceColumn + 1 < gridSize && Pieces[pieceRow - 1, pieceColumn + 1].Fill == color)
+            {
+                capture = true;
+            }
+            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
+            {
+                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
+                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
             }
             else
             {
@@ -262,17 +258,12 @@ namespace Pente_Kill.Controls
         {
             int jumpCount = count;
 
-            if (pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn].Fill != color && Pieces[pieceRow + 1, pieceColumn].Fill != Brushes.Transparent)
+            if (pieceColumn + 1 < gridSize && Pieces[pieceRow, pieceColumn + 1].Fill != color && Pieces[pieceRow, pieceColumn + 1].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureRight(pieceRow + 1, pieceColumn, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
+                jumpCount = CheckForCaptureRight(pieceRow, pieceColumn + 1, jumpCount, color);
             }
-            else if (pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn].Fill == color)
+            else if (pieceColumn + 1 < gridSize && Pieces[pieceRow, pieceColumn + 1].Fill == color)
             {
                 capture = true;
             }
@@ -297,11 +288,6 @@ namespace Pente_Kill.Controls
             {
                 jumpCount++;
                 jumpCount = CheckForCaptureDownRight(pieceRow + 1, pieceColumn + 1, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
             }
             else if (pieceColumn + 1 < gridSize && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn + 1].Fill == color)
             {
@@ -324,17 +310,12 @@ namespace Pente_Kill.Controls
         {
             int jumpCount = count;
 
-            if (pieceColumn + 1 < gridSize && Pieces[pieceRow, pieceColumn + 1].Fill != color && Pieces[pieceRow, pieceColumn + 1].Fill != Brushes.Transparent)
+            if (pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn].Fill != color && Pieces[pieceRow + 1, pieceColumn].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureDown(pieceRow, pieceColumn + 1, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
+                jumpCount = CheckForCaptureDown(pieceRow + 1, pieceColumn, jumpCount, color);
             }
-            else if (pieceColumn + 1 < gridSize && Pieces[pieceRow, pieceColumn + 1].Fill == color)
+            else if (pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn].Fill == color)
             {
                 capture = true;
             }
@@ -355,17 +336,12 @@ namespace Pente_Kill.Controls
         {
             int jumpCount = count;
 
-            if (pieceRow - 1 > -1 && pieceColumn + 1 < gridSize && Pieces[pieceRow - 1, pieceColumn + 1].Fill != color && Pieces[pieceRow - 1, pieceColumn + 1].Fill != Brushes.Transparent)
+            if (pieceColumn - 1 > -1 && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn - 1].Fill != color && Pieces[pieceRow + 1, pieceColumn - 1].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureDownLeft(pieceRow - 1, pieceColumn + 1, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
+                jumpCount = CheckForCaptureDownLeft(pieceRow + 1, pieceColumn - 1, jumpCount, color);
             }
-            else if (pieceRow - 1 > -1 && pieceColumn + 1 < gridSize && Pieces[pieceRow - 1, pieceColumn + 1].Fill == color)
+            else if (pieceColumn - 1 > -1 && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn - 1].Fill == color)
             {
                 capture = true;
             }
@@ -386,17 +362,12 @@ namespace Pente_Kill.Controls
         {
             int jumpCount = count;
 
-            if (pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn].Fill != color && Pieces[pieceRow - 1, pieceColumn].Fill != Brushes.Transparent)
+            if (pieceColumn - 1 > -1 && Pieces[pieceRow, pieceColumn - 1].Fill != color && Pieces[pieceRow, pieceColumn - 1].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureLeft(pieceRow - 1, pieceColumn, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
+                jumpCount = CheckForCaptureLeft(pieceRow, pieceColumn - 1, jumpCount, color);
             }
-            else if (pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn].Fill == color)
+            else if (pieceColumn - 1 > -1 && Pieces[pieceRow, pieceColumn - 1].Fill == color)
             {
                 capture = true;
             }
@@ -421,11 +392,6 @@ namespace Pente_Kill.Controls
             {
                 jumpCount++;
                 jumpCount = CheckForCaptureUpLeft(pieceRow - 1, pieceColumn - 1, jumpCount, color);
-                if (Pieces[pieceRow, pieceColumn].Fill != color)
-                {
-                    placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                    Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-                }
             }
             else if (pieceColumn - 1 > -1 && pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn - 1].Fill == color)
             {
@@ -452,9 +418,9 @@ namespace Pente_Kill.Controls
             if (piece.Opacity == .5)
             {
 
-                for (int column = 0; column < gridSize && !found; column++)
+                for (int row = 0; row < gridSize && !found; row++)
                 {
-                    for (int row = 0; row < gridSize && !found; row++)
+                    for (int column = 0; column < gridSize && !found; column++)
                     {
                         if (Pieces[row, column].Equals(piece))
                         {

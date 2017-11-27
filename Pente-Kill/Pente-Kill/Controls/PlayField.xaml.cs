@@ -40,11 +40,13 @@ namespace Pente_Kill.Controls
         public PlayField(MainWindow window)
         {
             Main = window;
-            Main.Grid.Children.Clear();
             Main.Width = 850;
             Main.Height = 850;
+            Main.Grid.Children.Clear();
+            Main.Grid.Children.Add(this);
             gridSize = 10;
             CreateGrid();
+            //PlayGame();
         }
         
         /// <summary>

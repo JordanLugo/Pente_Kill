@@ -20,9 +20,20 @@ namespace Pente_Kill.Controls
     /// </summary>
     public partial class RulesControl : UserControl
     {
-        public RulesControl()
+        public MainWindow Window { get; set; }
+        public RulesControl(MainWindow main)
         {
             InitializeComponent();
+            Window = main;
+            Window.Height = 300;
+            Window.Width = 300;
+            Window.Grid.Children.Clear();
+            Window.Grid.Children.Add(this);
+        }
+
+        private void MenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            new MainMenuControl(Window);
         }
     }
 }

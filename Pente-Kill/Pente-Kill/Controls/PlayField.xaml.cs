@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Pente_Kill.Controls
 {
@@ -26,8 +27,9 @@ namespace Pente_Kill.Controls
         private List<Ellipse> pieceSearch = new List<Ellipse>();
         private const int gameBoardSize = 550;
         private bool playerOne = true;
-        private int turn = 0, gridSize;
+        private int turn = 0, gridSize, timerTicks = 21;
         bool capture = false;
+        private DispatcherTimer timer = new DispatcherTimer();
 
         public PlayField()
         {
@@ -39,6 +41,9 @@ namespace Pente_Kill.Controls
 
         public PlayField(MainWindow window)
         {
+            InitializeComponent();
+            timer.Interval = new TimeSpan(0, 0, 0, 1);
+            timer.Tick += Timer_Tick;
             Main = window;
             Main.Width = 850;
             Main.Height = 850;
@@ -46,9 +51,24 @@ namespace Pente_Kill.Controls
             Main.Grid.Children.Add(this);
             gridSize = 10;
             CreateGrid();
-            //PlayGame();
+            PlayGame();
         }
-        
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (timerTicks >= 0)
+            {
+                timerTicks--;
+                TimerLabel.Content = (timerTicks >= 10) ? $"0:{timerTicks}" : $"0:0{timerTicks}";
+                
+            }
+            else
+            {
+                EndTurn();
+                PlayGame();
+            }
+        }
+
         /// <summary>
         /// Creates and fills to a game board
         /// </summary>
@@ -114,6 +134,7 @@ namespace Pente_Kill.Controls
 
         private void EndTurn()
         {
+            timerTicks = 21;
             if (turn == 0)
             {
                 TurnOne(false);
@@ -188,6 +209,7 @@ namespace Pente_Kill.Controls
         
         private void Turn(bool player)
         {
+            timer.Start();
             Brush color = player ? Brushes.Black : Brushes.White;
             if (turn == 0)
             {
@@ -412,6 +434,11 @@ namespace Pente_Kill.Controls
             return jumpCount;
         }
 
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void PlacePiece(object sender, MouseButtonEventArgs e)
         {
             Ellipse piece = (Ellipse)sender;
@@ -451,6 +478,11 @@ namespace Pente_Kill.Controls
 
                 PlayGame();                
             }
+
+        }
+        public void LoadGame()
+        {
+
         }
     }
 }

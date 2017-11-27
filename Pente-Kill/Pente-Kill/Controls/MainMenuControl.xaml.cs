@@ -1,5 +1,4 @@
-﻿using Pente_Kill.Controls;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Pente_Kill
+namespace Pente_Kill.Controls
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainMenuControl.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainMenuControl : UserControl
     {
-        public MainWindow()
+        public MainMenuControl()
         {
             InitializeComponent();
         }

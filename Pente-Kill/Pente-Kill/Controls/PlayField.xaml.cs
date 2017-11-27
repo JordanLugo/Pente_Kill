@@ -26,8 +26,8 @@ namespace Pente_Kill.Controls
         private List<Ellipse> pieceSearch = new List<Ellipse>();
         private const int gameBoardSize = 550;
         private bool playerOne = true;
-        private int turn = 0, gridSize;
-        bool capture = false;
+        private int turn = 0, gridSize, playerOnePairsCaptured = 0, playerTwoPairsCaptured = 0;
+        private bool capture = false;
 
         public PlayField()
         {
@@ -39,6 +39,7 @@ namespace Pente_Kill.Controls
 
         public PlayField(MainWindow window)
         {
+            InitializeComponent();
             Main = window;
             Main.Width = 850;
             Main.Height = 850;
@@ -46,7 +47,7 @@ namespace Pente_Kill.Controls
             Main.Grid.Children.Add(this);
             gridSize = 10;
             CreateGrid();
-            //PlayGame();
+            PlayGame();
         }
         
         /// <summary>
@@ -181,7 +182,7 @@ namespace Pente_Kill.Controls
             {
                 for (int column = 3; column < gridSize - 3; column++)
                 {
-                    Color(Pieces[row, column], Brushes.Black, startEnd ? .5 : 1, startEnd);
+                    Color(Pieces[row, column], startEnd ? Brushes.Black : Brushes.Transparent, startEnd ? .5 : 1, startEnd);
                 }
             }
         }
@@ -203,16 +204,16 @@ namespace Pente_Kill.Controls
             }
         }
 
-        private int CheckForCaptureUp(int pieceRow, int pieceColumn, int count, Brush color)
+        private int CheckForCapture(int pieceRow, int pieceColumn, int rowMod, int columnMod, int count, Brush color)
         {
             int jumpCount = count;
 
-            if (pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn].Fill != color && Pieces[pieceRow - 1, pieceColumn].Fill != Brushes.Transparent)
+            if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill != color && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill != Brushes.Transparent)
             {
                 jumpCount++;
-                jumpCount = CheckForCaptureUp(pieceRow - 1, pieceColumn, jumpCount, color);
+                jumpCount = CheckForCapture(pieceRow + rowMod, pieceColumn + columnMod, rowMod, columnMod, jumpCount, color);
             }
-            else if (pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn].Fill == color)
+            else if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == color)
             {
                 capture = true;
             }
@@ -229,193 +230,67 @@ namespace Pente_Kill.Controls
             return jumpCount;
         }
 
-        private int CheckForCaptureUpRight(int pieceRow, int pieceColumn, int count, Brush color)
+        private int CheckForFiveInARow(int row, int column, int rowMod, int columnMod, Brush color)
         {
-            int jumpCount = count;
-
-            if (pieceRow - 1 > -1 && pieceColumn + 1 < gridSize && Pieces[pieceRow - 1, pieceColumn + 1].Fill != color && Pieces[pieceRow - 1, pieceColumn + 1].Fill != Brushes.Transparent)
+            if (row > -1 && row < gridSize && column > -1 && column < gridSize && Pieces[row, column].Fill == color)
             {
-                jumpCount++;
-                jumpCount = CheckForCaptureUpRight(pieceRow - 1, pieceColumn + 1, jumpCount, color);
-                
-            }
-            else if (pieceRow - 1 > -1 && pieceColumn + 1 < gridSize && Pieces[pieceRow - 1, pieceColumn + 1].Fill == color)
-            {
-                capture = true;
-            }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
-            {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
+                return CheckForFiveInARow(row + rowMod, column + columnMod, rowMod, columnMod, color) + 1;
             }
             else
             {
-                capture = false;
+                return 0;
             }
-
-            return jumpCount;
         }
 
-        private int CheckForCaptureRight(int pieceRow, int pieceColumn, int count, Brush color)
+        private bool CheckForWin(int row, int column)
         {
-            int jumpCount = count;
+            bool win = false;
 
-            if (pieceColumn + 1 < gridSize && Pieces[pieceRow, pieceColumn + 1].Fill != color && Pieces[pieceRow, pieceColumn + 1].Fill != Brushes.Transparent)
+            if (playerOnePairsCaptured == 5 || playerTwoPairsCaptured == 5)
             {
-                jumpCount++;
-                jumpCount = CheckForCaptureRight(pieceRow, pieceColumn + 1, jumpCount, color);
+                win = true;
             }
-            else if (pieceColumn + 1 < gridSize && Pieces[pieceRow, pieceColumn + 1].Fill == color)
+            else if (CheckForFiveInARow(row, column, -1, 0, Pieces[row, column].Fill) == 5)
             {
-                capture = true;
+                win = true;
             }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
+            else if (CheckForFiveInARow(row, column, -1, 1, Pieces[row, column].Fill) == 5)
             {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
+                win = true;
             }
-            else
+            else if (CheckForFiveInARow(row, column, 0, 1, Pieces[row, column].Fill) == 5)
             {
-                capture = false;
+                win = true;
             }
-
-            return jumpCount;
-        }
-
-        private int CheckForCaptureDownRight(int pieceRow, int pieceColumn, int count, Brush color)
-        {
-            int jumpCount = count;
-
-            if (pieceColumn + 1 < gridSize && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn + 1].Fill != color && Pieces[pieceRow + 1, pieceColumn + 1].Fill != Brushes.Transparent)
+            else if (CheckForFiveInARow(row, column, 1, 1, Pieces[row, column].Fill) == 5)
             {
-                jumpCount++;
-                jumpCount = CheckForCaptureDownRight(pieceRow + 1, pieceColumn + 1, jumpCount, color);
+                win = true;
             }
-            else if (pieceColumn + 1 < gridSize && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn + 1].Fill == color)
+            else if (CheckForFiveInARow(row, column, 1, 0, Pieces[row, column].Fill) == 5)
             {
-                capture = true;
+                win = true;
             }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
+            else if (CheckForFiveInARow(row, column, 1, -1, Pieces[row, column].Fill) == 5)
             {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
+                win = true;
             }
-            else
+            else if (CheckForFiveInARow(row, column, 0, -1, Pieces[row, column].Fill) == 5)
             {
-                capture = false;
+                win = true;
+            }
+            else if (CheckForFiveInARow(row, column, -1, -1, Pieces[row, column].Fill) == 5)
+            {
+                win = true;
             }
 
-            return jumpCount;
-        }
-
-        private int CheckForCaptureDown(int pieceRow, int pieceColumn, int count, Brush color)
-        {
-            int jumpCount = count;
-
-            if (pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn].Fill != color && Pieces[pieceRow + 1, pieceColumn].Fill != Brushes.Transparent)
-            {
-                jumpCount++;
-                jumpCount = CheckForCaptureDown(pieceRow + 1, pieceColumn, jumpCount, color);
-            }
-            else if (pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn].Fill == color)
-            {
-                capture = true;
-            }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
-            {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-            }
-            else
-            {
-                capture = false;
-            }
-
-            return jumpCount;
-        }
-
-        private int CheckForCaptureDownLeft(int pieceRow, int pieceColumn, int count, Brush color)
-        {
-            int jumpCount = count;
-
-            if (pieceColumn - 1 > -1 && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn - 1].Fill != color && Pieces[pieceRow + 1, pieceColumn - 1].Fill != Brushes.Transparent)
-            {
-                jumpCount++;
-                jumpCount = CheckForCaptureDownLeft(pieceRow + 1, pieceColumn - 1, jumpCount, color);
-            }
-            else if (pieceColumn - 1 > -1 && pieceRow + 1 < gridSize && Pieces[pieceRow + 1, pieceColumn - 1].Fill == color)
-            {
-                capture = true;
-            }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
-            {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-            }
-            else
-            {
-                capture = false;
-            }
-
-            return jumpCount;
-        }
-
-        private int CheckForCaptureLeft(int pieceRow, int pieceColumn, int count, Brush color)
-        {
-            int jumpCount = count;
-
-            if (pieceColumn - 1 > -1 && Pieces[pieceRow, pieceColumn - 1].Fill != color && Pieces[pieceRow, pieceColumn - 1].Fill != Brushes.Transparent)
-            {
-                jumpCount++;
-                jumpCount = CheckForCaptureLeft(pieceRow, pieceColumn - 1, jumpCount, color);
-            }
-            else if (pieceColumn - 1 > -1 && Pieces[pieceRow, pieceColumn - 1].Fill == color)
-            {
-                capture = true;
-            }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
-            {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-            }
-            else
-            {
-                capture = false;
-            }
-
-            return jumpCount;
-        }
-
-        private int CheckForCaptureUpLeft(int pieceRow, int pieceColumn, int count, Brush color)
-        {
-            int jumpCount = count;
-
-            if (pieceColumn - 1 > -1 && pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn - 1].Fill != color && Pieces[pieceRow - 1, pieceColumn - 1].Fill != Brushes.Transparent)
-            {
-                jumpCount++;
-                jumpCount = CheckForCaptureUpLeft(pieceRow - 1, pieceColumn - 1, jumpCount, color);
-            }
-            else if (pieceColumn - 1 > -1 && pieceRow - 1 > -1 && Pieces[pieceRow - 1, pieceColumn - 1].Fill == color)
-            {
-                capture = true;
-            }
-            if (capture && Pieces[pieceRow, pieceColumn].Fill != color)
-            {
-                placedPieces.Remove(Pieces[pieceRow, pieceColumn]);
-                Pieces[pieceRow, pieceColumn].Fill = Brushes.Transparent;
-            }
-            else
-            {
-                capture = false;
-            }
-
-            return jumpCount;
+            return win;
         }
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
         {
             Ellipse piece = (Ellipse)sender;
             bool found = false;
+            int arrayRow = 0, arrayColumn = 0;
             List<int> directionCount = new List<int>();
             if (piece.Opacity == .5)
             {
@@ -430,26 +305,45 @@ namespace Pente_Kill.Controls
                             Color(piece, playerOne ? Brushes.Black : Brushes.White, 1, false);                
                             placedPieces.Add(piece);
                             EndTurn();
-                            directionCount.Add(CheckForCaptureUp(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureUpRight(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureRight(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureDownRight(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureDown(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureDownLeft(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureLeft(row, column, 0, Pieces[row, column].Fill) - 1);
-                            directionCount.Add(CheckForCaptureUpLeft(row, column, 0, Pieces[row, column].Fill) - 1);
+                            arrayRow = row;
+                            arrayColumn = column;
+
+
+
                         }
                     }
                 }
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, -1, 0, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, -1, 1, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, 0, 1, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, 1, 1, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, 1, 0, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, 1, -1, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, 0, -1, 0, Pieces[arrayRow, arrayColumn].Fill));
+                directionCount.Add(CheckForCapture(arrayRow, arrayColumn, -1, -1, 0, Pieces[arrayRow, arrayColumn].Fill));
+
                 foreach (int count in directionCount)
                 {
                     if (count == 2)
                     {
-
+                        if (playerOne)
+                        {
+                            playerOnePairsCaptured++;
+                        }
+                        else
+                        {
+                            playerTwoPairsCaptured++;
+                        }
                     }
                 }
+                if (!CheckForWin(arrayRow, arrayColumn))
+                {
+                    PlayGame();                
+                }
+                else
+                {
 
-                PlayGame();                
+                }
             }
         }
     }

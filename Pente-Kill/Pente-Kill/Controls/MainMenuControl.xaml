@@ -18,12 +18,23 @@
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <Style TargetType="Button" >
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="MinWidth" Value="75"/>
+                <Setter Property="MinHeight" Value="20"/>
+                <Setter Property="Foreground" Value="Gold"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Grid.Column" Value="1"/>
+                <Setter Property="BorderBrush" Value="Gold"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+        </Grid.Resources>
         <Label
             Grid.Row="0"
             Grid.ColumnSpan="5"
@@ -31,113 +42,33 @@
             Foreground="Gold"
             FontSize="25"
             FontWeight="ExtraBold"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
+            VerticalContentAlignment="Center"
+            HorizontalContentAlignment="Center"
             />
         <Button
             x:Name="NewGameButton"
-            Grid.Column="1"
             Grid.Row="1"
-            Background="Black"
-            MinHeight="20"
-            MinWidth="20"
-            MaxHeight="25"
-            MaxWidth="25"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            />
-        <Label
-            x:Name="NewGameLabel"
-            Grid.Column="3"
-            Grid.Row="1"
-            Foreground="Gold"
-            Content="New Game"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Content="New Game" Click="NewGameButton_Click"
             />
         <Button
             x:Name="LoadGameButton"
-            Grid.Column="1"
             Grid.Row="2"
-            Background="Black"
-            MinHeight="20"
-            MinWidth="20"
-            MaxHeight="25"
-            MaxWidth="25"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            />
-        <Label
-            x:Name="LoadGameLabel"
-            Grid.Column="3"
-            Grid.Row="2"
-            Foreground="Gold"
-            Content="Load Game"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Content="Load Game" Click="LoadGameButton_Click"
             />
         <Button
             x:Name="RulesButton"
-            Grid.Column="1"
             Grid.Row="3"
-            Background="Black"
-            MinHeight="20"
-            MinWidth="20"
-            MaxHeight="25"
-            MaxWidth="25"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            />
-        <Label
-            x:Name="RulesLabel"
-            Grid.Column="3"
-            Grid.Row="3"
-            Foreground="Gold"
-            Content="Rules"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Content="Rules" Click="RulesButton_Click"
             />
         <Button
             x:Name="OptionsButton"
-            Grid.Column="1"
             Grid.Row="4"
-            Background="Black"
-            MinHeight="20"
-            MinWidth="20"
-            MaxHeight="25"
-            MaxWidth="25"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            />
-        <Label
-            x:Name="OptionsLabel"
-            Grid.Column="3"
-            Grid.Row="4"
-            Foreground="Gold"
-            Content="Options"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Content="Options" Click="OptionsButton_Click"
             />
         <Button
             x:Name="ExitButton"
-            Grid.Column="1"
             Grid.Row="5"
-            Background="Black"
-            MinHeight="20"
-            MinWidth="20"
-            MaxHeight="25"
-            MaxWidth="25"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center"
-            />
-        <Label
-            x:Name="ExitLabel"
-            Grid.Column="3"
-            Grid.Row="5"
-            Foreground="Gold"
-            Content="Exit"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
+            Content="Exit" Click="ExitButton_Click"
             />
     </Grid>
 </UserControl>

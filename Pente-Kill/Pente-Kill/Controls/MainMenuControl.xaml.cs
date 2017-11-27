@@ -20,10 +20,38 @@ namespace Pente_Kill.Controls
     /// </summary>
     public partial class MainMenuControl : UserControl
     {
-        public MainMenuControl()
+        public MainMenuControl(MainWindow main)
         {
             InitializeComponent();
+            main.Grid.Children.Clear();
+            main.Width = 300;
+            main.Height = 300;
+            main.Grid.Children.Add(this);            
         }
 
+        private void NewGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void LoadGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RulesButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OptionsButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

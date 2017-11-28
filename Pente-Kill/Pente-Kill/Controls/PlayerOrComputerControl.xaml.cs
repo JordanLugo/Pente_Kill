@@ -20,9 +20,28 @@ namespace Pente_Kill.Controls
     /// </summary>
     public partial class PlayerOrComputerControl : UserControl
     {
-        public PlayerOrComputerControl()
+        public MainWindow Maine { get; set; }
+        public int BoardSize { get; set; }
+        public PlayerOrComputerControl(MainWindow window, int boardSize)
         {
             InitializeComponent();
+            Maine = window;
+            BoardSize = boardSize;
+            Maine.Height = 500;
+            Maine.Width = 500;
+            Maine.Grid.Children.Clear();
+            Maine.Grid.Children.Add(this);
+        }
+
+        private void ComputerButton_Click(object sender, RoutedEventArgs e)
+        {
+            new PlayField(Maine, BoardSize, true);
+        }
+
+        private void PlayerButton_Click(object sender, RoutedEventArgs e)
+        {
+            new PlayField(Maine, BoardSize, false);
+
         }
     }
 }

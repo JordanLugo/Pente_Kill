@@ -27,6 +27,7 @@
             Background="Transparent"
             Foreground="WhiteSmoke"
             FontWeight="Bold"
+            Click="PlayerButton_Click"
             />
         <Button 
             x:Name="ComputerButton"
@@ -38,6 +39,7 @@
             Background="Transparent"
             Foreground="WhiteSmoke"
             FontWeight="Bold"
+            Click="ComputerButton_Click"
             />
         <Label 
             Content="Choose your opponent:" 

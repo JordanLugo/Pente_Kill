@@ -58,6 +58,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\PlayerOrComputerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\PlayField.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -80,6 +84,9 @@
     </Compile>
     <Compile Include="Controls\MainMenuControl.xaml.cs">
       <DependentUpon>MainMenuControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PlayerOrComputerControl.xaml.cs">
+      <DependentUpon>PlayerOrComputerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PlayField.xaml.cs">
       <DependentUpon>PlayField.xaml</DependentUpon>
@@ -121,6 +128,8 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Pics\pill.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

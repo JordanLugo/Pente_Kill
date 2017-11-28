@@ -150,9 +150,9 @@ namespace Pente_Kill.Controls
             {
                 TurnOne(false);
             }
-            else if (turn == 2)
+            else if (turn == 1)
             {
-                TurnThree(false);
+                TurnTwo(false);
             }
             else
             {
@@ -207,13 +207,13 @@ namespace Pente_Kill.Controls
             }
         }
 
-        private void TurnThree(bool startEnd)
+        private void TurnTwo(bool startEnd)
         {
             for (int row = 3; row < gridSize - 3; row++)
             {
                 for (int column = 3; column < gridSize - 3; column++)
                 {
-                    Color(Pieces[row, column], startEnd ? Brushes.Black : Brushes.Transparent, startEnd ? .5 : 1, startEnd);
+                    Color(Pieces[row, column], startEnd ? Brushes.White : Brushes.Transparent, startEnd ? .5 : 1, startEnd);
                 }
             }
         }
@@ -226,9 +226,9 @@ namespace Pente_Kill.Controls
             {
                 TurnOne(true);
             }
-            else if (turn == 2)
+            else if (turn == 1)
             {
-                TurnThree(true);
+                TurnTwo(true);
             }
             else
             {
@@ -275,12 +275,12 @@ namespace Pente_Kill.Controls
             }
         }
 
-        private bool CheckForSpecificNumberOfPiecesInARow(int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod, int pieceCountLimit, bool foundEnd = false)
+        private bool CheckForSpecificNumberOfPiecesInARow(int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod, int pieceCountLimit, bool foundEnd = false, bool special = false)
         {
             bool count = false;
             if (placedPieceRow + rowDirectionMod > -1 && placedPieceRow + rowDirectionMod < gridSize && placedPieceColumn + columnDirectionMod > -1 && placedPieceColumn + columnDirectionMod < gridSize && Pieces[placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod].Fill == Pieces[placedPieceRow, placedPieceColumn].Fill && !foundEnd)
             {
-                return CheckForSpecificNumberOfPiecesInARow(placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod, rowDirectionMod, columnDirectionMod, pieceCountLimit, foundEnd);
+                return CheckForSpecificNumberOfPiecesInARow(placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod, rowDirectionMod, columnDirectionMod, pieceCountLimit, foundEnd, special);
             }
             else
             {
@@ -290,7 +290,14 @@ namespace Pente_Kill.Controls
             {
                 count = placedPieceRow - (rowDirectionMod * (pieceCountLimit)) > -1 && placedPieceRow - (rowDirectionMod * (pieceCountLimit)) < gridSize && placedPieceColumn - (columnDirectionMod * (pieceCountLimit)) > -1 && placedPieceColumn - (columnDirectionMod * (pieceCountLimit)) < gridSize && Pieces[placedPieceRow - (rowDirectionMod * (pieceCountLimit)), placedPieceColumn - (columnDirectionMod * (pieceCountLimit))].Fill == Brushes.Transparent;
             }
-            if (count)
+            if (special)
+            {
+                if (!count)
+                {
+                    count = placedPieceRow + rowDirectionMod > -1 && placedPieceRow + rowDirectionMod < gridSize && placedPieceColumn + columnDirectionMod > -1 && placedPieceColumn + columnDirectionMod < gridSize && Pieces[placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod].Fill == Brushes.Transparent;
+                }
+            }
+            else if (count)
             {
                 count = placedPieceRow + rowDirectionMod > -1 && placedPieceRow + rowDirectionMod < gridSize && placedPieceColumn + columnDirectionMod > -1 && placedPieceColumn + columnDirectionMod < gridSize && Pieces[placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod].Fill == Brushes.Transparent;
             }
@@ -312,7 +319,7 @@ namespace Pente_Kill.Controls
                     win = true;
                     break;
                 case 4:
-                    if (CheckForSpecificNumberOfPiecesInARow(placedPieceRow, placedPieceColumn, rowDirectionMod, columnDirectionMod, 4))
+                    if (CheckForSpecificNumberOfPiecesInARow(placedPieceRow, placedPieceColumn, rowDirectionMod, columnDirectionMod, 4, special: true))
                     {
                         MessageBox.Show($"{(!playerOne ? "Black" : "White")} has achieved Tessera");
                     }
@@ -358,7 +365,6 @@ namespace Pente_Kill.Controls
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             List<object> saveData = new List<object>();
-                        
             saveData.Add(Pieces);
             saveData.Add(placedPieces);
             saveData.Add(playerOne);
@@ -422,6 +428,7 @@ namespace Pente_Kill.Controls
                 }
                 else
                 {
+                    
                     timer.Stop();
                     new WinControl(Main, !playerOne);
                 }

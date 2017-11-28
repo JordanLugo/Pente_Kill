@@ -131,5 +131,8 @@
   <ItemGroup>
     <Resource Include="Pics\pill.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SavedGames\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

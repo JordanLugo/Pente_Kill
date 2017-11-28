@@ -324,6 +324,11 @@ namespace Pente_Kill.Controls
             return count;
         }
 
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            new MainMenuControl(Main);
+        }
+
         private bool CheckForPieceGroupings(int pieceCount, int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod)
         {
             bool win = false;
@@ -469,6 +474,7 @@ namespace Pente_Kill.Controls
                 {
                     
                     timer.Stop();
+                    new WinControl(Main, !playerOne);
                 }
             }
 

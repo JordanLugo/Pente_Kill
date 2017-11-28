@@ -9,8 +9,8 @@
           Margin="5"
           Background="GreenYellow">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="75*"/>
+            <ColumnDefinition Width="25*"/>
         </Grid.ColumnDefinitions>
         <Label VerticalAlignment="Center"
                HorizontalAlignment="Center">
@@ -24,12 +24,20 @@
             </Grid>
         </Label>
 
-        <Grid x:Name="TimerSave"
+        <Grid x:Name="TimerSaveBack"
               Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+            <Grid.Resources>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="Black"/>
+                    <Setter Property="Foreground" Value="Gold"/>
+                    <Setter Property="FontSize" Value="24"/>
+                </Style>
+            </Grid.Resources>
             <Label x:Name="TimerLabel"
                    HorizontalContentAlignment="Center"
                    VerticalContentAlignment="Center"
@@ -39,10 +47,13 @@
                    />
             <Button x:Name="SaveButton"
                     Grid.Row="1"
-                    Background="Black"
-                    Foreground="Gold"
-                    FontSize="24"
-                    Content="Save" Click="SaveButton_Click"/>
+                    Content="Save"
+                    Click="SaveButton_Click"/>
+            <Button x:Name="BackButton"
+                    Grid.Row="2"
+                    Content="Back" Click="BackButton_Click"
+                    
+                    />
         </Grid>
     </Grid>
 </UserControl>

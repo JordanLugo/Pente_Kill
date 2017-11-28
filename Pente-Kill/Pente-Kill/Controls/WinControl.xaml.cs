@@ -16,24 +16,15 @@ using System.Windows.Shapes;
 namespace Pente_Kill.Controls
 {
     /// <summary>
-    /// Interaction logic for RulesControl.xaml
+    /// Interaction logic for WinControl.xaml
     /// </summary>
-    public partial class RulesControl : UserControl
+    public partial class WinControl : UserControl
     {
-        public MainWindow Window { get; set; }
-        public RulesControl(MainWindow main)
+        public MainWindow Winder { get; set; }
+        public WinControl(MainWindow window, bool isBlackWin)
         {
             InitializeComponent();
-            Window = main;
-            Window.Height = 550;
-            Window.Width = 300;
-            Window.Grid.Children.Clear();
-            Window.Grid.Children.Add(this);
-        }
-
-        private void MenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            new MainMenuControl(Window);
+            winLabel.Content = (isBlackWin) ? "Congrats Black, you win!!!" : "Congrats White, you win!!!";
         }
     }
 }

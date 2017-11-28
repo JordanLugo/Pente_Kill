@@ -4,9 +4,51 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Pente_Kill.Controls"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             Height="500"
+             Width="500">
     <Grid>
-          <Label
-              back
+        <Label
+              x:Name="BackgroundLabel"
+              Height="500"
+              Width="500"
+              >
+            <Label.Background>
+                <ImageBrush ImageSource="/Pente-Kill;component/Pics/pill.jpg" Opacity="0.6"/>
+            </Label.Background>
+        </Label>
+        <Button 
+            x:Name="PlayerButton"
+            Content="Player" 
+            HorizontalAlignment="Left" 
+            Margin="376,374,0,0" 
+            VerticalAlignment="Top" 
+            Width="57"
+            Background="Transparent"
+            Foreground="WhiteSmoke"
+            FontWeight="Bold"
+            />
+        <Button 
+            x:Name="ComputerButton"
+            Content="Computer" 
+            HorizontalAlignment="Left" 
+            Margin="61,374,0,0" 
+            VerticalAlignment="Top" 
+            Width="64"
+            Background="Transparent"
+            Foreground="WhiteSmoke"
+            FontWeight="Bold"
+            />
+        <Label 
+            Content="Choose your opponent:" 
+            HorizontalAlignment="Left" 
+            Margin="138,240,0,0" 
+            VerticalAlignment="Top" 
+            Width="220" 
+            Height="37"
+            FontSize="20"
+            Foreground="WhiteSmoke"
+            />
+
     </Grid>
 </UserControl>

@@ -12,7 +12,8 @@
             <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Label>
+        <Label VerticalAlignment="Center"
+               HorizontalAlignment="Center">
             <Grid>
                 <Label Background="Black"
                        x:Name="intersections"/>

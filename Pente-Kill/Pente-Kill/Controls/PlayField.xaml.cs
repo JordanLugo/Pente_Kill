@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,10 +26,11 @@ namespace Pente_Kill.Controls
         public MainWindow Main { get; set; }
         public Ellipse[,] Pieces { get; set; } = null;
         private List<Ellipse> placedPieces = new List<Ellipse>();
-        private List<Ellipse> pieceSearch = new List<Ellipse>();
         private const int gameBoardSize = 550;
         private bool playerOne = true;
-        private int turn = 0, gridSize, playerOnePairsCaptured = 0, playerTwoPairsCaptured = 0, timerTicks = 21;        private bool capture = false;        private DispatcherTimer timer = new DispatcherTimer();
+        private int turn = 0, gridSize, playerOnePairsCaptured = 0, playerTwoPairsCaptured = 0, timerTicks = 21;
+        private bool capture = false, computerPlayer = false;
+        private DispatcherTimer timer = new DispatcherTimer();
 
         public PlayField()
         {
@@ -37,23 +40,25 @@ namespace Pente_Kill.Controls
             PlayGame();
         }
 
-        public PlayField(MainWindow window)
+        public PlayField(MainWindow window, int boardSize, bool computerPlayer)
         {
             InitializeComponent();
             timer.Interval = new TimeSpan(0, 0, 0, 1);
-            timer.Tick += Timer_Tick;            Main = window;
+            timer.Tick += Timer_Tick;
+            Main = window;
             Main.Width = 850;
             Main.Height = 850;
             Main.Grid.Children.Clear();
             Main.Grid.Children.Add(this);
-            gridSize = 10;
+            this.computerPlayer = computerPlayer;
+            gridSize = boardSize;
             CreateGrid();
             PlayGame();
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (timerTicks >= 0)
+            if (timerTicks > 0)
             {
                 timerTicks--;
                 TimerLabel.Content = (timerTicks >= 10) ? $"0:{timerTicks}" : $"0:0{timerTicks}";
@@ -115,7 +120,6 @@ namespace Pente_Kill.Controls
                 Pieces[row, column].Height = pieceSize - 3;
                 Pieces[row, column].Width = pieceSize - 3;
                 Pieces[row, column].Fill = Brushes.Transparent;
-                Pieces[row, column].Margin = boardSeparation;
                 Grid.SetColumn(Pieces[row, column], column);
                 Grid.SetRow(Pieces[row, column], row);
                 foreGrid.Children.Add(Pieces[row, column]);
@@ -126,7 +130,17 @@ namespace Pente_Kill.Controls
 
         private void PlayGame()
         {
-            Turn(playerOne);
+            if (!computerPlayer)
+            {
+                Turn(playerOne);
+            }
+            else
+            {
+                if (!playerOne)
+                {
+                    //Computers Move
+                }
+            }
         }
 
         private void EndTurn()
@@ -231,7 +245,7 @@ namespace Pente_Kill.Controls
                 jumpCount++;
                 jumpCount = CheckForCapture(pieceRow + rowMod, pieceColumn + columnMod, rowMod, columnMod, jumpCount, color);
             }
-            else if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == color)
+            else if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == color && jumpCount == 2)
             {
                 capture = true;
             }
@@ -242,17 +256,18 @@ namespace Pente_Kill.Controls
             }
             else
             {
+                jumpCount = 0;
                 capture = false;
             }
 
             return jumpCount;
         }
 
-        private int CheckForFiveInARow(int row, int column, int rowMod, int columnMod, Brush color)
+        private int CheckPieceRowCount(int row, int column, int rowMod, int columnMod, Brush color)
         {
             if (row > -1 && row < gridSize && column > -1 && column < gridSize && Pieces[row, column].Fill == color)
             {
-                return CheckForFiveInARow(row + rowMod, column + columnMod, rowMod, columnMod, color) + 1;
+                return CheckPieceRowCount(row + rowMod, column + columnMod, rowMod, columnMod, color) + 1;
             }
             else
             {
@@ -260,43 +275,74 @@ namespace Pente_Kill.Controls
             }
         }
 
+        private bool CheckForSpecificNumberOfPiecesInARow(int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod, int pieceCountLimit, bool foundEnd = false)
+        {
+            bool count = false;
+            if (placedPieceRow + rowDirectionMod > -1 && placedPieceRow + rowDirectionMod < gridSize && placedPieceColumn + columnDirectionMod > -1 && placedPieceColumn + columnDirectionMod < gridSize && Pieces[placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod].Fill == Pieces[placedPieceRow, placedPieceColumn].Fill && !foundEnd)
+            {
+                return CheckForSpecificNumberOfPiecesInARow(placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod, rowDirectionMod, columnDirectionMod, pieceCountLimit, foundEnd);
+            }
+            else
+            {
+                foundEnd = true;
+            }
+            if (foundEnd)
+            {
+                count = placedPieceRow - (rowDirectionMod * (pieceCountLimit)) > -1 && placedPieceRow - (rowDirectionMod * (pieceCountLimit)) < gridSize && placedPieceColumn - (columnDirectionMod * (pieceCountLimit)) > -1 && placedPieceColumn - (columnDirectionMod * (pieceCountLimit)) < gridSize && Pieces[placedPieceRow - (rowDirectionMod * (pieceCountLimit)), placedPieceColumn - (columnDirectionMod * (pieceCountLimit))].Fill == Brushes.Transparent;
+            }
+            if (count)
+            {
+                count = placedPieceRow + rowDirectionMod > -1 && placedPieceRow + rowDirectionMod < gridSize && placedPieceColumn + columnDirectionMod > -1 && placedPieceColumn + columnDirectionMod < gridSize && Pieces[placedPieceRow + rowDirectionMod, placedPieceColumn + columnDirectionMod].Fill == Brushes.Transparent;
+            }
+
+            return count;
+        }
+
+        private bool CheckForPieceGroupings(int pieceCount, int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod)
+        {
+            bool win = false;
+            switch (pieceCount)
+            {
+                case 5:
+                    win = true;
+                    break;
+                case 4:
+                    if (CheckForSpecificNumberOfPiecesInARow(placedPieceRow, placedPieceColumn, rowDirectionMod, columnDirectionMod, 4))
+                    {
+                        MessageBox.Show($"{(!playerOne ? "Black" : "White")} has achieved Tessera");
+                    }
+                    break;
+                case 3:
+                    if (CheckForSpecificNumberOfPiecesInARow(placedPieceRow, placedPieceColumn, rowDirectionMod, columnDirectionMod, 3))
+                    {
+                        MessageBox.Show($"{(!playerOne ? "Black" : "White")} has achieved Tria");
+                    }
+                    break;
+            }
+            return win;
+        }
+
         private bool CheckForWin(int row, int column)
         {
             bool win = false;
 
-            if (playerOnePairsCaptured == 5 || playerTwoPairsCaptured == 5)
+            if (!win)
             {
-                win = true;
+                win = CheckForPieceGroupings(CheckPieceRowCount(row, column, -1, 0, Pieces[row, column].Fill) + CheckPieceRowCount(row, column, 1, 0, Pieces[row, column].Fill) - 1, row, column, -1, 0);
             }
-            else if (CheckForFiveInARow(row, column, -1, 0, Pieces[row, column].Fill) == 5)
+            if (!win)
             {
-                win = true;
+                win = CheckForPieceGroupings(CheckPieceRowCount(row, column, -1, 1, Pieces[row, column].Fill) + CheckPieceRowCount(row, column, 1, -1, Pieces[row, column].Fill) - 1, row, column, -1, 1);
             }
-            else if (CheckForFiveInARow(row, column, -1, 1, Pieces[row, column].Fill) == 5)
+            if (!win)
             {
-                win = true;
+                win = CheckForPieceGroupings(CheckPieceRowCount(row, column, 0, 1, Pieces[row, column].Fill) + CheckPieceRowCount(row, column, 0, -1, Pieces[row, column].Fill) - 1, row, column, 0, 1);
             }
-            else if (CheckForFiveInARow(row, column, 0, 1, Pieces[row, column].Fill) == 5)
+            if (!win)
             {
-                win = true;
+                win = CheckForPieceGroupings(CheckPieceRowCount(row, column, 1, 1, Pieces[row, column].Fill) + CheckPieceRowCount(row, column, -1, -1, Pieces[row, column].Fill) - 1, row, column, 1, 1);
             }
-            else if (CheckForFiveInARow(row, column, 1, 1, Pieces[row, column].Fill) == 5)
-            {
-                win = true;
-            }
-            else if (CheckForFiveInARow(row, column, 1, 0, Pieces[row, column].Fill) == 5)
-            {
-                win = true;
-            }
-            else if (CheckForFiveInARow(row, column, 1, -1, Pieces[row, column].Fill) == 5)
-            {
-                win = true;
-            }
-            else if (CheckForFiveInARow(row, column, 0, -1, Pieces[row, column].Fill) == 5)
-            {
-                win = true;
-            }
-            else if (CheckForFiveInARow(row, column, -1, -1, Pieces[row, column].Fill) == 5)
+            if (playerOnePairsCaptured == 5 || playerTwoPairsCaptured == 5 && !win)
             {
                 win = true;
             }
@@ -306,7 +352,16 @@ namespace Pente_Kill.Controls
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-
+            List<object> saveData = new List<object>();
+                        
+            saveData.Add(Pieces);
+            saveData.Add(placedPieces);
+            saveData.Add(playerOne);
+            saveData.Add(computerPlayer);
+            saveData.Add(turn);
+            saveData.Add(gridSize);
+            saveData.Add(playerOnePairsCaptured);
+            saveData.Add(playerTwoPairsCaptured);
         }
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
@@ -330,9 +385,6 @@ namespace Pente_Kill.Controls
                             EndTurn();
                             arrayRow = row;
                             arrayColumn = column;
-
-
-
                         }
                     }
                 }
@@ -365,15 +417,28 @@ namespace Pente_Kill.Controls
                 }
                 else
                 {
-
+                    timer.Stop();
                 }
             }
 
         }
-        public void LoadGame()
+        public void LoadGame(FileStream saveDataFile)
         {
+            BinaryFormatter formatter = new BinaryFormatter();
 
+            List<object> allDataDeserialized = (List<object>)formatter.Deserialize(saveDataFile);
+
+            Pieces = (Ellipse[,])allDataDeserialized.ElementAt(0);
+            placedPieces = (List<Ellipse>)allDataDeserialized.ElementAt(1);
+            playerOne = (bool)allDataDeserialized.ElementAt(2);
+            computerPlayer = (bool)allDataDeserialized.ElementAt(3);
+            turn = (int)allDataDeserialized.ElementAt(4);
+            gridSize = (int)allDataDeserialized.ElementAt(5);
+            playerOnePairsCaptured = (int)allDataDeserialized.ElementAt(6);
+            playerTwoPairsCaptured = (int)allDataDeserialized.ElementAt(7);
+
+            CreateGrid();
+            PlayGame();
         }
     }
 }
-

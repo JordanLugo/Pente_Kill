@@ -37,7 +37,13 @@ namespace Pente_Kill.Controls
 
         private void HomeMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            new MainMenuControl(Window);
+            new MainMenuControl(Window).UpdateGridSize(BoardSize);
+        }
+
+        private void BoardSizeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Slider gridSizeSlider = (Slider)sender;
+            BoardSize = (int)gridSizeSlider.Value;
         }
     }
 }

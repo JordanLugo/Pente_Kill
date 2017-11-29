@@ -24,6 +24,7 @@ namespace Pente_Kill.Controls
         public WinControl(MainWindow window, bool isBlackWin)
         {
             InitializeComponent();
+            Winder = window;
             winLabel.Content = (isBlackWin) ? "Congrats Black, you win!!!" : "Congrats White, you win!!!";
             Winder.Width = 300;
             Winder.Height = 300;

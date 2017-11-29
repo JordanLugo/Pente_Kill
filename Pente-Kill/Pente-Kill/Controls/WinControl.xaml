@@ -23,6 +23,6 @@
                 Foreground="Gold"
                 Content="Back to Main Menu"
                 FontFamily="Times New Roman"
-                FontSize="24"/>
+                FontSize="24" Click="Button_Click"/>
     </Grid>
 </UserControl>

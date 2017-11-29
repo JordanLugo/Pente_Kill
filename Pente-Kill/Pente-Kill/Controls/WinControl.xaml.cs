@@ -31,5 +31,10 @@ namespace Pente_Kill.Controls
             Winder.Grid.Children.Clear();
             Winder.Grid.Children.Add(this);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            new MainMenuControl(Winder);
+        }
     }
 }

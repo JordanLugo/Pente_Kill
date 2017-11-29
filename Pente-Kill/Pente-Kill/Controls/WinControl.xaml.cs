@@ -24,11 +24,17 @@ namespace Pente_Kill.Controls
         public WinControl(MainWindow window, bool isBlackWin)
         {
             InitializeComponent();
+            Winder = window;
             winLabel.Content = (isBlackWin) ? "Congrats Black, you win!!!" : "Congrats White, you win!!!";
             Winder.Width = 300;
             Winder.Height = 300;
             Winder.Grid.Children.Clear();
             Winder.Grid.Children.Add(this);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            new MainMenuControl(Winder);
         }
     }
 }

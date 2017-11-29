@@ -326,7 +326,7 @@ namespace Pente_Kill.Controls
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            new MainMenuControl(Main);
+            new MainMenuControl(Main).UpdateGridSize(gridSize);
         }
 
         private bool CheckForPieceGroupings(int pieceCount, int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod)
@@ -509,7 +509,7 @@ namespace Pente_Kill.Controls
             playerOne = (bool)allDataDeserialized.ElementAt(2);
             computerPlayer = (bool)allDataDeserialized.ElementAt(3);
             turn = (int)allDataDeserialized.ElementAt(4);
-            gridSize = (int)allDataDeserialized.ElementAt(5);
+            gridSize = (int)allDataDeserialized.ElementAt(5);            
             playerOnePairsCaptured = (int)allDataDeserialized.ElementAt(6);
             playerTwoPairsCaptured = (int)allDataDeserialized.ElementAt(7);
 

@@ -25,6 +25,10 @@ namespace Pente_Kill.Controls
         {
             InitializeComponent();
             winLabel.Content = (isBlackWin) ? "Congrats Black, you win!!!" : "Congrats White, you win!!!";
+            Winder.Width = 300;
+            Winder.Height = 300;
+            Winder.Grid.Children.Clear();
+            Winder.Grid.Children.Add(this);
         }
     }
 }

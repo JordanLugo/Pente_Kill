@@ -26,7 +26,7 @@ namespace Pente_Kill.Controls
             InitializeComponent();
             Window = main;
             Window.Height = 550;
-            Window.Width = 300;
+            Window.Width = 450;
             Window.Grid.Children.Clear();
             Window.Grid.Children.Add(this);
         }

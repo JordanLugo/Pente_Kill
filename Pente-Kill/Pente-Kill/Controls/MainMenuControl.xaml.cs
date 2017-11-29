@@ -39,8 +39,7 @@ namespace Pente_Kill.Controls
 
         private void LoadGameButton_Click(object sender, RoutedEventArgs e)
         {
-            new PlayField(Window).LoadGame(new System.IO.FileStream(@"SavePente/Game.ser", System.IO.FileMode.Open));
-        }
+            new PlayField(Window).LoadGame(new System.IO.FileStream(@"SavePente/Game.ser", System.IO.FileMode.Open));        }
 
         private void RulesButton_Click(object sender, RoutedEventArgs e)
         {

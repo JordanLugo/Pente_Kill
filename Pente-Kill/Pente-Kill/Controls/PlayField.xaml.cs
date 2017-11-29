@@ -81,7 +81,10 @@ namespace Pente_Kill.Controls
         /// <param name="gridSize">The number of pieces along the edges of the wanted upon creation.</param>
         private void CreateGrid(bool loading = false)
         {
-            Pieces = new Ellipse[gridSize, gridSize];
+            if (!loading)
+            {
+                Pieces = new Ellipse[gridSize, gridSize];
+            }
             Thickness boardSeparation = new Thickness(1);
             Thickness borderThickness = new Thickness(0);
             int column = 0, row = 0, boardSize = (gameBoardSize - gridSize * 2 )/ (gridSize + 1), pieceSize = ((gameBoardSize - (gridSize - 1) * 2) - boardSize) / gridSize;
@@ -169,9 +172,9 @@ namespace Pente_Kill.Controls
             {
                 TurnOne(false);
             }
-            else if (turn == 1)
+            else if (turn == 2)
             {
-                TurnTwo(false);
+                TurnThree(false);
             }
             else
             {
@@ -202,17 +205,8 @@ namespace Pente_Kill.Controls
         {
             Brush color = startEnd ? Brushes.Black : Brushes.Transparent;
             int test = gridSize / 2;
-            if (gridSize % 2 == 0)
-            {
-                Color(Pieces[test - 1, test - 1], color, startEnd ? .5 : 1, startEnd);
-                Color(Pieces[test, test - 1], color, startEnd ? .5 : 1, startEnd);
-                Color(Pieces[test - 1, test], color, startEnd ? .5 : 1, startEnd);
-                Color(Pieces[test, test], color, startEnd ? .5 : 1, startEnd);
-            }
-            else
-            {
-                Color(Pieces[test, test], color, startEnd ? .5 : 1, startEnd);
-            }
+            
+            Color(Pieces[test, test], color, startEnd ? .5 : 1, startEnd);
         }
 
         private void AllOtherTurns(bool startEnd, Brush color)
@@ -226,13 +220,17 @@ namespace Pente_Kill.Controls
             }
         }
 
-        private void TurnTwo(bool startEnd)
+        private void TurnThree(bool startEnd)
         {
-            for (int row = 3; row < gridSize - 3; row++)
+            int centerPiece = gridSize / 2;
+            for (int row = 0; row < gridSize; row++)
             {
-                for (int column = 3; column < gridSize - 3; column++)
+                for (int column = 0; column < gridSize; column++)
                 {
-                    Color(Pieces[row, column], startEnd ? Brushes.White : Brushes.Transparent, startEnd ? .5 : 1, startEnd);
+                    if (row > (centerPiece + 2) || row < (centerPiece - 2) || column > (centerPiece + 2) || column < (centerPiece - 2))
+                    {
+                        Color(Pieces[row, column], startEnd ? Brushes.Black : Brushes.Transparent, startEnd ? .5 : 1, startEnd);
+                    }
                 }
             }
         }
@@ -245,9 +243,9 @@ namespace Pente_Kill.Controls
             {
                 TurnOne(true);
             }
-            else if (turn == 1)
+            else if (turn == 2)
             {
-                TurnTwo(true);
+                TurnThree(true);
             }
             else
             {
@@ -326,7 +324,7 @@ namespace Pente_Kill.Controls
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            new MainMenuControl(Main);
+            new MainMenuControl(Main).UpdateGridSize(gridSize);
         }
 
         private bool CheckForPieceGroupings(int pieceCount, int placedPieceRow, int placedPieceColumn, int rowDirectionMod, int columnDirectionMod)
@@ -417,6 +415,7 @@ namespace Pente_Kill.Controls
             saveData.Add(playerTwoPairsCaptured);
 
             binaryFormatter.Serialize(fileStream, saveData);
+            fileStream.Close();
         }
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
@@ -488,16 +487,17 @@ namespace Pente_Kill.Controls
             List<string> twoDimentionalArrayString = new List<string>();
             List<string> boardPiecesString = new List<string>();
 
+            gridSize = (int)allDataDeserialized.ElementAt(5);
+            Pieces = new Ellipse[gridSize, gridSize];
+
             twoDimentionalArrayString = (List<string>)allDataDeserialized.ElementAt(0);
-            foreach (string piece in twoDimentionalArrayString)
+            for (int itemCount = 0; itemCount < twoDimentionalArrayString.Count; itemCount++)
             {
-                Pieces[int.Parse(piece.Split('/')[0]), int.Parse(piece.Split('/')[1])] = new Ellipse()
-                {
-                    Height = int.Parse(piece.Split('/')[3]),
-                    Width = int.Parse(piece.Split('/')[4]),
-                    Fill = piece.Split('/')[5] == "Black" ? Brushes.Black : piece.Split('/')[5] == "White" ? Brushes.White : Brushes.Transparent,
-                    Opacity = double.Parse(piece.Split('/')[6])
-                };
+                Pieces[int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[0]), int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[1])] = new Ellipse();
+                Pieces[int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[0]), int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[1])].Height = int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[2]);
+                Pieces[int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[0]), int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[1])].Width = int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[3]);
+                Pieces[int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[0]), int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[1])].Fill = twoDimentionalArrayString.ElementAt(itemCount).Split('/')[4] == "Black" ? Brushes.Black : twoDimentionalArrayString.ElementAt(itemCount).Split('/')[4] == "White" ? Brushes.White : Brushes.Transparent;
+                Pieces[int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[0]), int.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[1])].Opacity = double.Parse(twoDimentionalArrayString.ElementAt(itemCount).Split('/')[5]);
             }
 
             boardPiecesString = (List<string>)allDataDeserialized.ElementAt(1);
@@ -509,7 +509,6 @@ namespace Pente_Kill.Controls
             playerOne = (bool)allDataDeserialized.ElementAt(2);
             computerPlayer = (bool)allDataDeserialized.ElementAt(3);
             turn = (int)allDataDeserialized.ElementAt(4);
-            gridSize = (int)allDataDeserialized.ElementAt(5);
             playerOnePairsCaptured = (int)allDataDeserialized.ElementAt(6);
             playerTwoPairsCaptured = (int)allDataDeserialized.ElementAt(7);
 

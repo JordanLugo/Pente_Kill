@@ -39,7 +39,7 @@ namespace Pente_Kill.Controls
 
         private void LoadGameButton_Click(object sender, RoutedEventArgs e)
         {
-            new PlayField(Window, playGridSize).LoadGame(new System.IO.FileStream(@"/SavePente/Game.ser", System.IO.FileMode.Open));
+            new PlayField(Window).LoadGame(new System.IO.FileStream(@"SavePente/Game.ser", System.IO.FileMode.Open));
         }
 
         private void RulesButton_Click(object sender, RoutedEventArgs e)
@@ -49,7 +49,7 @@ namespace Pente_Kill.Controls
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
-            new SettingsControl(Window);
+            new SettingsControl(Window).BoardSize = playGridSize;
         }
 
         public void UpdateGridSize(int gridSliderSizeSelection)

@@ -509,7 +509,7 @@ namespace Pente_Kill.Controls
             playerOne = (bool)allDataDeserialized.ElementAt(2);
             computerPlayer = (bool)allDataDeserialized.ElementAt(3);
             turn = (int)allDataDeserialized.ElementAt(4);
-            playerOnePairsCaptured = (int)allDataDeserialized.ElementAt(6);
+            gridSize = (int)allDataDeserialized.ElementAt(5);            playerOnePairsCaptured = (int)allDataDeserialized.ElementAt(6);
             playerTwoPairsCaptured = (int)allDataDeserialized.ElementAt(7);
 
             CreateGrid(true);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,8 +21,7 @@ namespace Pente_Kill.Controls
     /// </summary>
     public partial class MainMenuControl : UserControl
     {
-        public MainWindow Window { get; set; }
-        private int playGridSize = 9;
+        public MainWindow Window { get; set; }        
         public MainMenuControl(MainWindow main)
         {
             InitializeComponent();
@@ -39,8 +39,12 @@ namespace Pente_Kill.Controls
 
         private void LoadGameButton_Click(object sender, RoutedEventArgs e)
         {
-            new PlayField(Window).LoadGame(new System.IO.FileStream(@"SavePente/Game.ser", System.IO.FileMode.Open));        }
-
+            using (FileStream io = new FileStream(@"SavePente/Game.ser", FileMode.Open))
+            {
+                new PlayField(Window).LoadGame(io);
+            }
+        
+        }
         private void RulesButton_Click(object sender, RoutedEventArgs e)
         {
             new RulesControl(Window);
@@ -48,8 +52,7 @@ namespace Pente_Kill.Controls
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
-            new SettingsControl(Window).BoardSize = playGridSize;
-        }
+            new SettingsControl(Window).BoardSize = PlayGridSize;        }
 
         public void UpdateGridSize(int gridSliderSizeSelection)
         {

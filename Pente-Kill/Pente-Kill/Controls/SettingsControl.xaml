@@ -37,6 +37,7 @@
             x:Name="BoardSizeSlider"
             Grid.Row="1"
             Grid.Column="2"
+            Value="{Binding Path=BoardSize, Mode=TwoWay}"
             Minimum="9"
             Maximum="39"
             MinWidth="100"

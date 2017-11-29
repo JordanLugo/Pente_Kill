@@ -21,7 +21,8 @@ namespace Pente_Kill.Controls
     /// </summary>
     public partial class MainMenuControl : UserControl
     {
-        public MainWindow Window { get; set; }        
+        public MainWindow Window { get; set; }
+        private int playGridSize = 9;
         public MainMenuControl(MainWindow main)
         {
             InitializeComponent();
@@ -52,7 +53,7 @@ namespace Pente_Kill.Controls
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
-            new SettingsControl(Window).BoardSize = PlayGridSize;        }
+            new SettingsControl(Window).BoardSize = playGridSize;        }
 
         public void UpdateGridSize(int gridSliderSizeSelection)
         {

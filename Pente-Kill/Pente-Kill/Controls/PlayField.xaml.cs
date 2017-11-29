@@ -32,12 +32,16 @@ namespace Pente_Kill.Controls
         private bool capture = false, computerPlayer = false;
         private DispatcherTimer timer = new DispatcherTimer();
 
-        public PlayField()
+        public PlayField(MainWindow window)
         {
             InitializeComponent();
-            gridSize = 10;
-            CreateGrid();
-            PlayGame();
+            timer.Interval = new TimeSpan(0, 0, 0, 1);
+            timer.Tick += Timer_Tick;
+            Main = window;
+            Main.Width = 850;
+            Main.Height = 850;
+            Main.Grid.Children.Clear();
+            Main.Grid.Children.Add(this);
         }
 
         public PlayField(MainWindow window, int boardSize, bool computerPlayer)
@@ -75,7 +79,7 @@ namespace Pente_Kill.Controls
         /// Creates and fills to a game board
         /// </summary>
         /// <param name="gridSize">The number of pieces along the edges of the wanted upon creation.</param>
-        private void CreateGrid()
+        private void CreateGrid(bool loading = false)
         {
             Pieces = new Ellipse[gridSize, gridSize];
             Thickness boardSeparation = new Thickness(1);
@@ -114,17 +118,32 @@ namespace Pente_Kill.Controls
             }
             column = 0;
             row = 0;
-            for (int gridPosition = 0; gridPosition < Math.Pow(gridSize, 2); gridPosition++)
+            if (!loading)
             {
-                Pieces[row, column] = new Ellipse();
-                Pieces[row, column].Height = pieceSize - 3;
-                Pieces[row, column].Width = pieceSize - 3;
-                Pieces[row, column].Fill = Brushes.Transparent;
-                Grid.SetColumn(Pieces[row, column], column);
-                Grid.SetRow(Pieces[row, column], row);
-                foreGrid.Children.Add(Pieces[row, column]);
-                column = (column == gridSize - 1) ? 0 : column + 1;
-                row = (column == 0) ? row + 1 : row;
+                for (int gridPosition = 0; gridPosition < Math.Pow(gridSize, 2); gridPosition++)
+                {
+                    Pieces[row, column] = new Ellipse();
+                    Pieces[row, column].Height = pieceSize - 3;
+                    Pieces[row, column].Width = pieceSize - 3;
+                    Pieces[row, column].Fill = Brushes.Transparent;
+                    Grid.SetColumn(Pieces[row, column], column);
+                    Grid.SetRow(Pieces[row, column], row);
+                    foreGrid.Children.Add(Pieces[row, column]);
+                    column = (column == gridSize - 1) ? 0 : column + 1;
+                    row = (column == 0) ? row + 1 : row;
+                }
+            }
+            else
+            {
+                for (int pieceRow = 0; pieceRow < gridSize; pieceRow++)
+                {
+                    for (int pieceColumn = 0; pieceColumn < gridSize; pieceColumn++)
+                    {
+                        Grid.SetColumn(Pieces[pieceRow, pieceColumn], pieceColumn);
+                        Grid.SetRow(Pieces[pieceRow, pieceColumn], pieceRow);
+                        foreGrid.Children.Add(Pieces[pieceRow, pieceColumn]);
+                    }
+                }
             }
         }
 
@@ -364,15 +383,40 @@ namespace Pente_Kill.Controls
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            string path = "SavePente";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            FileStream fileStream = new FileStream($"{path}/Game.ser", FileMode.OpenOrCreate);
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+            List<string> listOfPiecesCurrentState = new List<string>();
+            List<string> listOfPiecesOnTheBoard = new List<string>();
             List<object> saveData = new List<object>();
-            saveData.Add(Pieces);
-            saveData.Add(placedPieces);
+            
+            for (int row = 0; row < gridSize; row++)
+            {
+                for (int column = 0; column < gridSize; column++)
+                {
+                    listOfPiecesCurrentState.Add($"{row}/{column}/{Pieces[row, column].ActualHeight}/{Pieces[row, column].ActualWidth}/{(Pieces[row, column].Fill == Brushes.Black ? "Black" : Pieces[row, column].Fill == Brushes.White ? "White" : "Transparent")}/{Pieces[row, column].Opacity}");
+                    if (placedPieces.Contains(Pieces[row, column]))
+                    {
+                        listOfPiecesOnTheBoard.Add($"{row}/{column}");
+                    }
+                }
+            }
+
+            saveData.Add(listOfPiecesCurrentState);
+            saveData.Add(listOfPiecesOnTheBoard);
             saveData.Add(playerOne);
             saveData.Add(computerPlayer);
             saveData.Add(turn);
             saveData.Add(gridSize);
             saveData.Add(playerOnePairsCaptured);
             saveData.Add(playerTwoPairsCaptured);
+
+            binaryFormatter.Serialize(fileStream, saveData);
         }
 
         private void PlacePiece(object sender, MouseButtonEventArgs e)
@@ -441,8 +485,27 @@ namespace Pente_Kill.Controls
 
             List<object> allDataDeserialized = (List<object>)formatter.Deserialize(saveDataFile);
 
-            Pieces = (Ellipse[,])allDataDeserialized.ElementAt(0);
-            placedPieces = (List<Ellipse>)allDataDeserialized.ElementAt(1);
+            List<string> twoDimentionalArrayString = new List<string>();
+            List<string> boardPiecesString = new List<string>();
+
+            twoDimentionalArrayString = (List<string>)allDataDeserialized.ElementAt(0);
+            foreach (string piece in twoDimentionalArrayString)
+            {
+                Pieces[int.Parse(piece.Split('/')[0]), int.Parse(piece.Split('/')[1])] = new Ellipse()
+                {
+                    Height = int.Parse(piece.Split('/')[3]),
+                    Width = int.Parse(piece.Split('/')[4]),
+                    Fill = piece.Split('/')[5] == "Black" ? Brushes.Black : piece.Split('/')[5] == "White" ? Brushes.White : Brushes.Transparent,
+                    Opacity = double.Parse(piece.Split('/')[6])
+                };
+            }
+
+            boardPiecesString = (List<string>)allDataDeserialized.ElementAt(1);
+            foreach (string place in boardPiecesString)
+            {
+                placedPieces.Add(Pieces[int.Parse(place.Split('/')[0]), int.Parse(place.Split('/')[1])]);
+            }
+            
             playerOne = (bool)allDataDeserialized.ElementAt(2);
             computerPlayer = (bool)allDataDeserialized.ElementAt(3);
             turn = (int)allDataDeserialized.ElementAt(4);
@@ -450,7 +513,7 @@ namespace Pente_Kill.Controls
             playerOnePairsCaptured = (int)allDataDeserialized.ElementAt(6);
             playerTwoPairsCaptured = (int)allDataDeserialized.ElementAt(7);
 
-            CreateGrid();
+            CreateGrid(true);
             PlayGame();
         }
     }

@@ -573,7 +573,10 @@ namespace Pente_Kill.Controls
             }
             else
             {
-                jumpCount = 0;
+                if (!capture)
+                {
+                    jumpCount = 0;
+                }
                 capture = false;
             }
 

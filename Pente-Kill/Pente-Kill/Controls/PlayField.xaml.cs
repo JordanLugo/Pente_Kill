@@ -29,7 +29,7 @@ namespace Pente_Kill.Controls
         private const int gameBoardSize = 550;
         private bool playerOne = true;
         private int turn = 0, gridSize, playerOnePairsCaptured = 0, playerTwoPairsCaptured = 0, timerTicks = 21;
-        private bool capture = false, computerPlayer = true;
+        private bool capture = false, computerPlayer = false;
         private DispatcherTimer timer = new DispatcherTimer();
 
         public PlayField(MainWindow window)
@@ -54,7 +54,7 @@ namespace Pente_Kill.Controls
             Main.Height = 850;
             Main.Grid.Children.Clear();
             Main.Grid.Children.Add(this);
-            //this.computerPlayer = computerPlayer;
+            this.computerPlayer = computerPlayer;
             gridSize = boardSize;
             CreateGrid();
             PlayGame();
@@ -162,6 +162,41 @@ namespace Pente_Kill.Controls
                 {
                     AITurnAndLogic();
                     EndTurn();
+                    string piece = FindLastPiecePlaced();
+                    List<int> directionCount = new List<int>();
+
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), -1, 0, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), -1, 1, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), 0, 1, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), 1, 1, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), 1, 0, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), 1, -1, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), 0, -1, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+                    directionCount.Add(CheckForCapture(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1]), -1, -1, 0, Pieces[int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])].Fill));
+
+                    foreach (int count in directionCount)
+                    {
+                        if (count == 2)
+                        {
+                            if (playerOne)
+                            {
+                                playerOnePairsCaptured++;
+                            }
+                            else
+                            {
+                                playerTwoPairsCaptured++;
+                            }
+                        }
+                    }
+                    if (!CheckForWin(int.Parse(piece.Split(' ')[0]), int.Parse(piece.Split(' ')[1])))
+                    {
+                        PlayGame();
+                    }
+                    else
+                    {
+                        timer.Stop();
+                        new WinControl(Main, !playerOne);
+                    }
                     PlayGame();
                 }
                 else
@@ -169,6 +204,24 @@ namespace Pente_Kill.Controls
                     Turn(playerOne);
                 }
             }
+        }
+
+        private string FindLastPiecePlaced()
+        {
+            string lastPiece = "";
+
+            for (int row = 0; row < gridSize; row++)
+            {
+                for (int column = 0; column < gridSize; column++)
+                {
+                    if (placedPieces.Last().Equals(Pieces[row, column]))
+                    {
+                        lastPiece = $"{row} {column}";
+                    }
+                }
+            }
+
+            return lastPiece;
         }
 
         private void AITurnAndLogic()
@@ -260,12 +313,21 @@ namespace Pente_Kill.Controls
 
             int amount;
             bool moveValidated = false;
+            List<string> remove = new List<string>();
             foreach (string checkIfBlocked in piecePlacementWeighting.Keys)
             {
                 if (piecePlacementWeighting.TryGetValue(checkIfBlocked, out amount))
                 {
-                    CheckForBlocked(checkIfBlocked, amount);
+                    if(CheckForBlocked(checkIfBlocked, amount))
+                    {
+                        remove.Add(checkIfBlocked);
+                    }
                 }
+            }
+
+            foreach (string blocked in remove)
+            {
+                piecePlacementWeighting.Remove(blocked);
             }
 
             if (piecePlacementWeighting.Values.ToList().Contains(4))
@@ -307,9 +369,12 @@ namespace Pente_Kill.Controls
 
             if (!placePiece.Equals(""))
             {
-                placedPieces.Add(Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])]);
-                Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])].Fill = Brushes.White;
-                validMove = true;
+                if (Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])].Fill == Brushes.Transparent)
+                {
+                    placedPieces.Add(Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])]);
+                    Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])].Fill = Brushes.White;
+                    validMove = true;
+                }
             }
 
             return validMove;
@@ -319,13 +384,10 @@ namespace Pente_Kill.Controls
         {
             bool blocked = false;
 
-            if (int.Parse(group.Split(' ')[0]) + int.Parse(group.Split(' ')[2]) > -1 && int.Parse(group.Split(' ')[1]) + int.Parse(group.Split(' ')[3]) > -1 && int.Parse(group.Split(' ')[0]) + int.Parse(group.Split(' ')[2]) <gridSize && int.Parse(group.Split(' ')[1]) + int.Parse(group.Split(' ')[3]) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) + int.Parse(group.Split(' ')[2]), int.Parse(group.Split(' ')[1]) + int.Parse(group.Split(' ')[3])].Fill == Brushes.White)
+            blocked = int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]) == -1 || int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3]) == -1 || int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]) == gridSize || int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3]) == gridSize;
+            if (!blocked)
             {
-                blocked = int.Parse(group.Split(' ')[0]) + (int.Parse(group.Split(' ')[2]) * count) > -1 && int.Parse(group.Split(' ')[1]) + (int.Parse(group.Split(' ')[3]) * count) > -1 && int.Parse(group.Split(' ')[0]) + (int.Parse(group.Split(' ')[2]) * count) < gridSize && int.Parse(group.Split(' ')[1]) + (int.Parse(group.Split(' ')[3]) * count) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) + (int.Parse(group.Split(' ')[2]) * count), int.Parse(group.Split(' ')[1]) + (int.Parse(group.Split(' ')[3]) * count)].Fill == Brushes.White;
-            }
-            else if (int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]) > -1 && int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3]) > -1 && int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]) < gridSize && int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3]) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]), int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3])].Fill == Brushes.White)
-            {
-                blocked = int.Parse(group.Split(' ')[0]) - (int.Parse(group.Split(' ')[2]) * count) > -1 && int.Parse(group.Split(' ')[1]) - (int.Parse(group.Split(' ')[3]) * count) > -1 && int.Parse(group.Split(' ')[0]) - (int.Parse(group.Split(' ')[2]) * count) < gridSize && int.Parse(group.Split(' ')[1]) - (int.Parse(group.Split(' ')[3]) * count) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) - (int.Parse(group.Split(' ')[2]) * count), int.Parse(group.Split(' ')[1]) - (int.Parse(group.Split(' ')[3]) * count)].Fill == Brushes.White;
+                blocked = Pieces[int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]), int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3])].Fill == Brushes.White;
             }
 
             return blocked;
@@ -335,13 +397,9 @@ namespace Pente_Kill.Controls
         {
             string piece = "";
 
-            if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == Brushes.Transparent)
+            if (pieceColumn - columnMod > -1 && pieceRow - rowMod > -1 && pieceColumn - columnMod < gridSize && pieceRow - rowMod < gridSize && Pieces[pieceRow - rowMod, pieceColumn - columnMod].Fill == Brushes.Transparent)
             {
-                piece = $"{pieceRow + rowMod} {pieceColumn + columnMod}";
-            }
-            else if (pieceColumn + (columnMod * -1) > -1 && pieceRow + (rowMod * -1) > -1 && pieceColumn + (columnMod * -1) < gridSize && pieceRow + (rowMod * -1) < gridSize && Pieces[pieceRow + (rowMod * -1), pieceColumn + (columnMod * -1)].Fill == Brushes.Transparent)
-            {
-                piece = $"{pieceRow + (rowMod * -1)} {pieceColumn + (columnMod * -1)}";
+                piece = $"{pieceRow - rowMod} {pieceColumn - columnMod}";
             }
 
             if (piece.Equals(""))
@@ -349,10 +407,6 @@ namespace Pente_Kill.Controls
                 if (pieceColumn + (columnMod * count) > -1 && pieceRow + (rowMod * count) > -1 && pieceColumn + (columnMod * count) < gridSize && pieceRow + (rowMod * count) < gridSize && Pieces[pieceRow + (rowMod * count), pieceColumn + (columnMod * count)].Fill == Brushes.Transparent)
                 {
                     piece = $"{pieceRow + (rowMod * count)} {pieceColumn + (columnMod * count)}";
-                }
-                else if (pieceColumn + (columnMod * -count) > -1 && pieceRow + (rowMod * -count) > -1 && pieceColumn + (columnMod * -count) < gridSize && pieceRow + (rowMod * -count) < gridSize && Pieces[pieceRow + (rowMod * -count), pieceColumn + (columnMod * -count)].Fill == Brushes.Transparent)
-                {
-                    piece = $"{pieceRow + (rowMod * -count)} {pieceColumn + (columnMod * -count)}";
                 }
             }
 
@@ -366,11 +420,6 @@ namespace Pente_Kill.Controls
             if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == Brushes.Black)
             {
                 pieces.AddRange(CheckForConnectedToEndPiece(pieceRow + rowMod, pieceColumn + columnMod, rowMod, columnMod));
-                return pieces;
-            }
-            else if (pieceColumn + (columnMod * 1) > -1 && pieceRow + (rowMod * -1) > -1 && pieceColumn + (columnMod * 1) < gridSize && pieceRow + (rowMod * -1) < gridSize && Pieces[pieceRow + (rowMod * -1), pieceColumn + (columnMod * 1)].Fill == Brushes.Black)
-            {
-                pieces.AddRange(CheckForConnectedToEndPiece(pieceRow + (rowMod * -1), pieceColumn + (columnMod * 1), (rowMod * -1), (columnMod * 1)));
                 return pieces;
             }
 

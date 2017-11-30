@@ -160,9 +160,14 @@ namespace Pente_Kill.Controls
             {
                 if (!playerOne)
                 {
-                    //Computers Move
+                    AITurnAndLogic();
                 }
             }
+        }
+
+        private void AITurnAndLogic()
+        {
+
         }
 
         private void EndTurn()

@@ -29,7 +29,7 @@ namespace Pente_Kill.Controls
         private const int gameBoardSize = 550;
         private bool playerOne = true;
         private int turn = 0, gridSize, playerOnePairsCaptured = 0, playerTwoPairsCaptured = 0, timerTicks = 21;
-        private bool capture = false, computerPlayer = false;
+        private bool capture = false, computerPlayer = true;
         private DispatcherTimer timer = new DispatcherTimer();
 
         public PlayField(MainWindow window)
@@ -54,7 +54,7 @@ namespace Pente_Kill.Controls
             Main.Height = 850;
             Main.Grid.Children.Clear();
             Main.Grid.Children.Add(this);
-            this.computerPlayer = computerPlayer;
+            //this.computerPlayer = computerPlayer;
             gridSize = boardSize;
             CreateGrid();
             PlayGame();
@@ -161,13 +161,259 @@ namespace Pente_Kill.Controls
                 if (!playerOne)
                 {
                     AITurnAndLogic();
+                    EndTurn();
+                    PlayGame();
+                }
+                else
+                {
+                    Turn(playerOne);
                 }
             }
         }
 
         private void AITurnAndLogic()
         {
+            List<Ellipse> lookIntoPiecesList = new List<Ellipse>();
+            List<Ellipse> ignorePieces = new List<Ellipse>();
+            Dictionary<string, int> piecePlacementWeighting = new Dictionary<string, int>();
+            Random rand = new Random();
 
+            for (int pieces = 0; pieces < placedPieces.Count; pieces++)
+            {
+                if (placedPieces.ElementAt(pieces).Fill.Equals(Brushes.Black))
+                {
+                    lookIntoPiecesList.Add(placedPieces.ElementAt(pieces));
+                }
+            }
+
+            for (int row = 0; row < gridSize; row++)
+            {
+                for (int column = 0; column < gridSize; column++)
+                {
+                    if (lookIntoPiecesList.Contains(Pieces[row, column]))
+                    {
+                        if(CheckForEndPieceAI(row, column, -1, 0))
+                        {
+                            ignorePieces.AddRange(CheckForConnectedToEndPiece(row, column, -1, 0));
+                            ignorePieces.Remove(Pieces[row, column]);
+                        }
+                        if (CheckForEndPieceAI(row, column, -1, +1))
+                        {
+                            ignorePieces.AddRange(CheckForConnectedToEndPiece(row, column, -1, +1));
+                            ignorePieces.Remove(Pieces[row, column]);
+                        }
+                        if (CheckForEndPieceAI(row, column, 0, +1))
+                        {
+                            ignorePieces.AddRange(CheckForConnectedToEndPiece(row, column, 0, +1));
+                            ignorePieces.Remove(Pieces[row, column]);
+                        }
+                        if (CheckForEndPieceAI(row, column, +1, +1))
+                        {
+                            ignorePieces.AddRange(CheckForConnectedToEndPiece(row, column, +1, +1));
+                            ignorePieces.Remove(Pieces[row, column]);
+                        }
+                    }
+                }
+            }
+
+            for (int row = 0; row < gridSize; row++)
+            {
+                for (int column = 0; column < gridSize; column++)
+                {
+                    if (lookIntoPiecesList.Contains(Pieces[row, column]) && !ignorePieces.Contains(Pieces[row, column]))
+                    {
+                        if (CheckPieceRowCount(row, column, -1, 0, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} -1 0", CheckPieceRowCount(row, column, -1, 0, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, -1, 1, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} -1 1", CheckPieceRowCount(row, column, -1, 1, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, 0, 1, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} 0 1", CheckPieceRowCount(row, column, 0, 1, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, 1, 1, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} 1 1", CheckPieceRowCount(row, column, 1, 1, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, 1, 0, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} 1 0", CheckPieceRowCount(row, column, 1, 0, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, 1, -1, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} 1 -1", CheckPieceRowCount(row, column, 1, -1, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, 0, -1, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} 0 -1", CheckPieceRowCount(row, column, 0, -1, Brushes.Black));
+                        }
+                        if (CheckPieceRowCount(row, column, -1, -1, Brushes.Black) > 1)
+                        {
+                            piecePlacementWeighting.Add($"{row} {column} -1 -1", CheckPieceRowCount(row, column, -1, -1, Brushes.Black));
+                        }
+                    }
+                }
+            }
+
+            int amount;
+            bool moveValidated = false;
+            foreach (string checkIfBlocked in piecePlacementWeighting.Keys)
+            {
+                if (piecePlacementWeighting.TryGetValue(checkIfBlocked, out amount))
+                {
+                    CheckForBlocked(checkIfBlocked, amount);
+                }
+            }
+
+            if (piecePlacementWeighting.Values.ToList().Contains(4))
+            {
+                moveValidated = AIPieceBlock(piecePlacementWeighting, 4);
+            }
+
+            if (!moveValidated && piecePlacementWeighting.Values.ToList().Contains(3))
+            {
+                moveValidated = AIPieceBlock(piecePlacementWeighting, 3);
+            }
+
+            if (!moveValidated && piecePlacementWeighting.Values.ToList().Contains(2))
+            {
+                moveValidated = AIPieceBlock(piecePlacementWeighting, 2);
+            }
+            if (!moveValidated)
+            {
+                bool validMove = false;
+                do
+                {
+                    int row = rand.Next(0, gridSize), column = rand.Next(0, gridSize);
+                    if (!placedPieces.Contains(Pieces[row, column]))
+                    {
+                        placedPieces.Add(Pieces[row, column]);
+                        Pieces[row, column].Fill = Brushes.White;
+                        validMove = true;
+                    }
+                } while (!validMove);
+            }
+        }
+
+        private bool AIPieceBlock(Dictionary<string, int> places, int count)
+        {
+            string key, placePiece;
+            bool validMove = false;
+            key = places.Keys.ElementAt(places.Values.ToList().IndexOf(2));
+            placePiece = FindEndsToAGroupOfPieces(int.Parse(key.Split(' ')[0]), int.Parse(key.Split(' ')[1]), int.Parse(key.Split(' ')[2]), int.Parse(key.Split(' ')[3]), count);
+
+            if (!placePiece.Equals(""))
+            {
+                placedPieces.Add(Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])]);
+                Pieces[int.Parse(placePiece.Split(' ')[0]), int.Parse(placePiece.Split(' ')[1])].Fill = Brushes.White;
+                validMove = true;
+            }
+
+            return validMove;
+        }
+
+        private bool CheckForBlocked(string group, int count)
+        {
+            bool blocked = false;
+
+            if (int.Parse(group.Split(' ')[0]) + int.Parse(group.Split(' ')[2]) > -1 && int.Parse(group.Split(' ')[1]) + int.Parse(group.Split(' ')[3]) > -1 && int.Parse(group.Split(' ')[0]) + int.Parse(group.Split(' ')[2]) <gridSize && int.Parse(group.Split(' ')[1]) + int.Parse(group.Split(' ')[3]) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) + int.Parse(group.Split(' ')[2]), int.Parse(group.Split(' ')[1]) + int.Parse(group.Split(' ')[3])].Fill == Brushes.White)
+            {
+                blocked = int.Parse(group.Split(' ')[0]) + (int.Parse(group.Split(' ')[2]) * count) > -1 && int.Parse(group.Split(' ')[1]) + (int.Parse(group.Split(' ')[3]) * count) > -1 && int.Parse(group.Split(' ')[0]) + (int.Parse(group.Split(' ')[2]) * count) < gridSize && int.Parse(group.Split(' ')[1]) + (int.Parse(group.Split(' ')[3]) * count) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) + (int.Parse(group.Split(' ')[2]) * count), int.Parse(group.Split(' ')[1]) + (int.Parse(group.Split(' ')[3]) * count)].Fill == Brushes.White;
+            }
+            else if (int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]) > -1 && int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3]) > -1 && int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]) < gridSize && int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3]) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) - int.Parse(group.Split(' ')[2]), int.Parse(group.Split(' ')[1]) - int.Parse(group.Split(' ')[3])].Fill == Brushes.White)
+            {
+                blocked = int.Parse(group.Split(' ')[0]) - (int.Parse(group.Split(' ')[2]) * count) > -1 && int.Parse(group.Split(' ')[1]) - (int.Parse(group.Split(' ')[3]) * count) > -1 && int.Parse(group.Split(' ')[0]) - (int.Parse(group.Split(' ')[2]) * count) < gridSize && int.Parse(group.Split(' ')[1]) - (int.Parse(group.Split(' ')[3]) * count) < gridSize && Pieces[int.Parse(group.Split(' ')[0]) - (int.Parse(group.Split(' ')[2]) * count), int.Parse(group.Split(' ')[1]) - (int.Parse(group.Split(' ')[3]) * count)].Fill == Brushes.White;
+            }
+
+            return blocked;
+        }
+
+        private string FindEndsToAGroupOfPieces(int pieceRow, int pieceColumn, int rowMod, int columnMod, int count)
+        {
+            string piece = "";
+
+            if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == Brushes.Transparent)
+            {
+                piece = $"{pieceRow + rowMod} {pieceColumn + columnMod}";
+            }
+            else if (pieceColumn + (columnMod * -1) > -1 && pieceRow + (rowMod * -1) > -1 && pieceColumn + (columnMod * -1) < gridSize && pieceRow + (rowMod * -1) < gridSize && Pieces[pieceRow + (rowMod * -1), pieceColumn + (columnMod * -1)].Fill == Brushes.Transparent)
+            {
+                piece = $"{pieceRow + (rowMod * -1)} {pieceColumn + (columnMod * -1)}";
+            }
+
+            if (piece.Equals(""))
+            {
+                if (pieceColumn + (columnMod * count) > -1 && pieceRow + (rowMod * count) > -1 && pieceColumn + (columnMod * count) < gridSize && pieceRow + (rowMod * count) < gridSize && Pieces[pieceRow + (rowMod * count), pieceColumn + (columnMod * count)].Fill == Brushes.Transparent)
+                {
+                    piece = $"{pieceRow + (rowMod * count)} {pieceColumn + (columnMod * count)}";
+                }
+                else if (pieceColumn + (columnMod * -count) > -1 && pieceRow + (rowMod * -count) > -1 && pieceColumn + (columnMod * -count) < gridSize && pieceRow + (rowMod * -count) < gridSize && Pieces[pieceRow + (rowMod * -count), pieceColumn + (columnMod * -count)].Fill == Brushes.Transparent)
+                {
+                    piece = $"{pieceRow + (rowMod * -count)} {pieceColumn + (columnMod * -count)}";
+                }
+            }
+
+            return piece;
+        }
+
+        private List<Ellipse> CheckForConnectedToEndPiece(int pieceRow, int pieceColumn, int columnMod, int rowMod)
+        {
+            List<Ellipse> pieces = new List<Ellipse>();
+
+            if (pieceColumn + columnMod > -1 && pieceRow + rowMod > -1 && pieceColumn + columnMod < gridSize && pieceRow + rowMod < gridSize && Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill == Brushes.Black)
+            {
+                pieces.AddRange(CheckForConnectedToEndPiece(pieceRow + rowMod, pieceColumn + columnMod, rowMod, columnMod));
+                return pieces;
+            }
+            else if (pieceColumn + (columnMod * 1) > -1 && pieceRow + (rowMod * -1) > -1 && pieceColumn + (columnMod * 1) < gridSize && pieceRow + (rowMod * -1) < gridSize && Pieces[pieceRow + (rowMod * -1), pieceColumn + (columnMod * 1)].Fill == Brushes.Black)
+            {
+                pieces.AddRange(CheckForConnectedToEndPiece(pieceRow + (rowMod * -1), pieceColumn + (columnMod * 1), (rowMod * -1), (columnMod * 1)));
+                return pieces;
+            }
+
+            return pieces;
+        }
+
+        private bool CheckForEndPieceAI(int pieceRow, int pieceColumn, int columnMod, int rowMod)
+        {
+            bool isFirstPiece = false;
+            
+            isFirstPiece = (pieceRow + rowMod) == -1 || (pieceColumn + columnMod) == -1 || (pieceRow + rowMod) == gridSize || (pieceColumn + columnMod) == gridSize;
+            if (!isFirstPiece)
+            {
+                isFirstPiece = (pieceRow + (rowMod * -1)) == -1 || (pieceColumn + (columnMod * -1)) == -1 || (pieceRow + (rowMod * -1)) == gridSize || (pieceColumn + (columnMod * -1)) == gridSize;
+                if (isFirstPiece)
+                {
+                    if (!Pieces[pieceRow, pieceColumn].Fill.Equals(Brushes.Black))
+                    {
+                        isFirstPiece = false;
+                    }
+                }
+            }
+            else 
+            {
+                if (!Pieces[pieceRow, pieceColumn].Fill.Equals(Brushes.Black))
+                {
+                    isFirstPiece = false;
+                }
+            }
+
+            if (!isFirstPiece)
+            {
+                if (Pieces[pieceRow + (rowMod * -1), pieceColumn + (columnMod * -1)].Fill.Equals(Brushes.Black))
+                {
+                    isFirstPiece = Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill.Equals(Brushes.Transparent);
+                }
+                else if (Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill.Equals(Brushes.Black))
+                {
+                    isFirstPiece = Pieces[pieceRow + rowMod, pieceColumn + columnMod].Fill.Equals(Brushes.Transparent);
+                }
+            }
+
+            return isFirstPiece;
         }
 
         private void EndTurn()
